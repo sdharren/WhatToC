@@ -2,13 +2,14 @@
 #include "../helpers/bit_helpers.h"
 #include "move_gen.h"
 #include "../helpers/prng.h"
-
 #include <iostream>
+
 unsigned long long generate_magic_number()
 {
     return get_random_64() & get_random_64() & get_random_64();
 }
 
+// generate blocker board number {index} for the attack mask
 Bitboard generate_blocker_board(int index, int num_of_blockers, Bitboard attack_mask)
 {
     Bitboard blocker_board = 0;
@@ -109,14 +110,16 @@ Bitboard generate_bishop_attack_map_with_blockers(int square, Bitboard blocker_b
 
 Bitboard find_magic_number(int square, int piece)
 {
+    // Initialise the correct attack mask
     auto x = MoveGenerator();
-
     Bitboard attack_mask = piece == R ? x.generate_rook_attack_mask_from_square(square) :
                                         x.generate_bishop_attack_mask_from_square(square);
 
+    // blocker information
     auto num_of_possible_blockers = count_bits(attack_mask);
     auto total_num_of_blocker_boards = 1 << num_of_possible_blockers;
 
+    // link blocker board to attack map
     std::array<Bitboard, 4096> blocker_boards{};
     std::array<Bitboard, 4096> attack_maps{};
 
@@ -128,20 +131,29 @@ Bitboard find_magic_number(int square, int piece)
     }
 
     std::array<Bitboard, 4096> used_attack_maps{};
+
     for (int random_count = 0; random_count < 100000000; random_count++)
     {
         auto magic_number = generate_magic_number();
+
+        // Reinitialise the used attack map
         used_attack_maps.fill(0ULL);
 
+        // get rid of bad magic number candidates
         if (count_bits((attack_mask * magic_number) & 0xFF00000000000000) < 6) continue;
+
         int index, fail;
         for (index = 0, fail = 0; !fail && index < total_num_of_blocker_boards; index++)
         {
+            // calculate magic index
             auto magic_index = (blocker_boards[index] * magic_number) >> (64 - num_of_possible_blockers);
+
+            // if there is no attack map, then fill
             if (used_attack_maps[magic_index] == 0ULL)
             {
                 used_attack_maps[magic_index] = attack_maps[index];
             }
+            // if there is an attack map, check if its the correct one
             else if (used_attack_maps[magic_index] != attack_maps[index])
             {
                 fail = 1;

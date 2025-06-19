@@ -29,7 +29,6 @@ enum Colour
 // Board class
 class Board
 {
-private:
     Bitboard piece_bitboards[12];
     Bitboard white_occupancy;
     Bitboard black_occupancy;

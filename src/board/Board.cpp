@@ -4,6 +4,7 @@
 
 #include "../helpers/bit_helpers.h"
 
+// function to pretty print the bitboard, for debugging
 void print(Bitboard bitboard)
 {
     std::cout << "     Bitboard: " << bitboard << std::endl;
