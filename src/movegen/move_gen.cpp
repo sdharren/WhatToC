@@ -129,7 +129,7 @@ Bitboard MoveGenerator::generate_rook_attack_mask_from_square(int square)
         set_bit(attack_mask, newSquare);
     }
 
-    // north
+    // south
     for (int newRank = rank - 1; newRank > 0; newRank--)
     {
         newSquare = newRank * 8 + file;
@@ -189,4 +189,88 @@ Bitboard MoveGenerator::generate_blocker_board(int index, int num_of_blockers, B
     }
 
     return blocker_board;
+}
+
+Bitboard MoveGenerator::generate_rook_attack_map_with_blockers(int square, Bitboard blocker_board)
+{
+    Bitboard attack_map = 0;
+    int rank =  square / 8;
+    int file = square % 8;
+    int newSquare;
+
+    // east
+    for (int newFile = file + 1; newFile < 8; newFile++)
+    {
+        newSquare = rank * 8 + newFile;
+        set_bit(attack_map, newSquare);
+        if (blocker_board & (1ULL << newSquare)) break;
+    }
+
+    // west
+    for (int newFile = file - 1; newFile >= 0; newFile--)
+    {
+        newSquare = rank * 8 + newFile;
+        set_bit(attack_map, newSquare);
+        if (blocker_board & (1ULL << newSquare)) break;
+    }
+
+    // north
+    for (int newRank = rank + 1; newRank < 8; newRank++)
+    {
+        newSquare = newRank * 8 + file;
+        set_bit(attack_map, newSquare);
+        if (blocker_board & (1ULL << newSquare)) break;
+    }
+
+    // south
+    for (int newRank = rank - 1; newRank >= 0; newRank--)
+    {
+        newSquare = newRank * 8 + file;
+        set_bit(attack_map, newSquare);
+        if (blocker_board & (1ULL << newSquare)) break;
+    }
+
+    return attack_map;
+}
+
+Bitboard MoveGenerator::generate_bishop_attack_map_with_blockers(int square, Bitboard blocker_board)
+{
+    Bitboard attack_map = 0;
+    int rank =  square / 8;
+    int file = square % 8;
+    int newSquare;
+
+    // NE
+    for (int newFile = file + 1, newRank = rank + 1; newFile < 8 && newRank < 8; newFile++, newRank++)
+    {
+        newSquare = newRank * 8 + newFile;
+        set_bit(attack_map, newSquare);
+        if (blocker_board & (1ULL << newSquare)) break;
+    }
+
+    // SE
+    for (int newFile = file + 1, newRank = rank - 1; newFile < 8 && newRank >= 0; newFile++, newRank--)
+    {
+        newSquare = newRank * 8 + newFile;
+        set_bit(attack_map, newSquare);
+        if (blocker_board & (1ULL << newSquare)) break;
+    }
+
+    // SW
+    for (int newFile = file - 1, newRank = rank - 1; newFile >= 0 && newRank >= 0; newFile--, newRank--)
+    {
+        newSquare = newRank * 8 + newFile;
+        set_bit(attack_map, newSquare);
+        if (blocker_board & (1ULL << newSquare)) break;
+    }
+
+    // NW
+    for (int newFile = file - 1, newRank = rank + 1; newFile >= 0 && newRank < 8; newFile--, newRank++)
+    {
+        newSquare = newRank * 8 + newFile;
+        set_bit(attack_map, newSquare);
+        if (blocker_board & (1ULL << newSquare)) break;
+    }
+
+    return attack_map;
 }
