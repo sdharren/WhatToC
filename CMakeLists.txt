@@ -12,4 +12,6 @@ add_executable(WhatToC src/main.cpp
         src/helpers/prng.h
         src/movegen/move_gen.cpp
         src/movegen/move_gen.h
+        src/movegen/find_magics.cpp
+        src/movegen/find_magics.h
 )
