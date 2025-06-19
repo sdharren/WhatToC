@@ -101,3 +101,79 @@ void MoveGenerator::initialise_leaper_piece_attack_tables()
 
 }
 
+Bitboard MoveGenerator::generate_rook_attack_mask_from_square(int square)
+{
+    Bitboard attack_mask = 0;
+    int rank =  square / 8;
+    int file = square % 8;
+    int newSquare;
+
+    // east
+    for (int newFile = file + 1; newFile < 7; newFile++)
+    {
+        newSquare = rank * 8 + newFile;
+        set_bit(attack_mask, newSquare);
+    }
+
+    // west
+    for (int newFile = file - 1; newFile > 0; newFile--)
+    {
+        newSquare = rank * 8 + newFile;
+        set_bit(attack_mask, newSquare);
+    }
+
+    // north
+    for (int newRank = rank + 1; newRank < 7; newRank++)
+    {
+        newSquare = newRank * 8 + file;
+        set_bit(attack_mask, newSquare);
+    }
+
+    // north
+    for (int newRank = rank - 1; newRank > 0; newRank--)
+    {
+        newSquare = newRank * 8 + file;
+        set_bit(attack_mask, newSquare);
+    }
+
+    return attack_mask;
+}
+
+Bitboard MoveGenerator::generate_bishop_attack_mask_from_square(int square)
+{
+    Bitboard attack_mask = 0;
+    int rank =  square / 8;
+    int file = square % 8;
+    int newSquare;
+
+    // NE
+    for (int newFile = file + 1, newRank = rank + 1; newFile < 7 && newRank < 7; newFile++, newRank++)
+    {
+        newSquare = newRank * 8 + newFile;
+        set_bit(attack_mask, newSquare);
+    }
+
+    // SE
+    for (int newFile = file + 1, newRank = rank - 1; newFile < 7 && newRank > 0; newFile++, newRank--)
+    {
+        newSquare = newRank * 8 + newFile;
+        set_bit(attack_mask, newSquare);
+    }
+
+    // SW
+    for (int newFile = file - 1, newRank = rank - 1; newFile > 0 && newRank > 0; newFile--, newRank--)
+    {
+        newSquare = newRank * 8 + newFile;
+        set_bit(attack_mask, newSquare);
+    }
+
+    // NW
+    for (int newFile = file - 1, newRank = rank + 1; newFile > 0 && newRank < 7; newFile--, newRank++)
+    {
+        newSquare = newRank * 8 + newFile;
+        set_bit(attack_mask, newSquare);
+    }
+
+    return attack_mask;
+}
+

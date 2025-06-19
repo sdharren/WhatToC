@@ -17,6 +17,8 @@ public:
     Bitboard generate_pawn_attack_from_square(int square, int colour);
     Bitboard generate_knight_attack_from_square(int square);
     Bitboard generate_king_attack_from_square(int square);
+    Bitboard generate_rook_attack_mask_from_square(int square);
+    Bitboard generate_bishop_attack_mask_from_square(int square);
 };
 
 #endif //MOVE_GEN_H
