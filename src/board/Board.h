@@ -1,6 +1,5 @@
 #ifndef BOARD_H
 #define BOARD_H
-#include <iostream>
 
 // important definitions
 using Bitboard = unsigned long long;

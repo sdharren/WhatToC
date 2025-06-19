@@ -10,4 +10,6 @@ add_executable(WhatToC src/main.cpp
         src/helpers/bit_helpers.h
         src/helpers/prng.cpp
         src/helpers/prng.h
+        src/movegen/move_gen.cpp
+        src/movegen/move_gen.h
 )

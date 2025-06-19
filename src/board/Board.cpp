@@ -1,5 +1,7 @@
 #include "Board.h"
 
+#include <iostream>
+
 #include "../helpers/bit_helpers.h"
 
 void print(Bitboard bitboard)
