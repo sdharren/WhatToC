@@ -27,6 +27,19 @@ enum Colour
     white, black,
 };
 
+// Board class
+class Board
+{
+private:
+    Bitboard piece_bitboards[12];
+    Bitboard white_occupancy;
+    Bitboard black_occupancy;
+    Bitboard occupied_squares;
+
+public:
+    Board();
+};
+
 // print bitboard
 void print(Bitboard bitboard);
 

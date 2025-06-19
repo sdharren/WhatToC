@@ -1,6 +1,6 @@
 #include "Board.h"
 
-#include "../bit_helpers/bit_helpers.h"
+#include "../helpers/bit_helpers.h"
 
 void print(Bitboard bitboard)
 {
