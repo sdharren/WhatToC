@@ -177,3 +177,16 @@ Bitboard MoveGenerator::generate_bishop_attack_mask_from_square(int square)
     return attack_mask;
 }
 
+Bitboard MoveGenerator::generate_blocker_board(int index, int num_of_blockers, Bitboard attack_mask)
+{
+    Bitboard blocker_board = 0;
+    for (int bit = 0; bit < num_of_blockers; bit++)
+    {
+        int square = get_LS1B(attack_mask);
+        attack_mask &= attack_mask - 1;
+
+        if (index & (1 << bit)) blocker_board |= 1ULL << square;
+    }
+
+    return blocker_board;
+}

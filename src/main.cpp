@@ -7,5 +7,8 @@
 int main()
 {
     auto x = MoveGenerator();
-    print(x.generate_bishop_attack_mask_from_square(56));
+    auto y = x.generate_rook_attack_mask_from_square(0);
+    auto z = count_bits(y);
+
+    print(x.generate_blocker_board(4093, z, y));
 }

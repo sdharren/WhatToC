@@ -19,6 +19,7 @@ public:
     Bitboard generate_king_attack_from_square(int square);
     Bitboard generate_rook_attack_mask_from_square(int square);
     Bitboard generate_bishop_attack_mask_from_square(int square);
+    Bitboard generate_blocker_board(int index, int num_of_blockers, Bitboard attack_mask);
 };
 
 #endif //MOVE_GEN_H
