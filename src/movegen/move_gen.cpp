@@ -1,5 +1,6 @@
 #include "move_gen.h"
 
+#include "find_magics.h"
 #include "../helpers/bit_helpers.h"
 
 Bitboard A_FILE_MASK = 0x0101010101010101;
@@ -7,7 +8,9 @@ Bitboard H_FILE_MASK = 0x8080808080808080;
 Bitboard AB_FILE_MASK = 0x303030303030303;
 Bitboard GH_FILE_MASK = 0xc0c0c0c0c0c0c0c0;
 
-MoveGenerator::MoveGenerator()
+MoveGenerator::MoveGenerator() : PAWN_ATTACK_TABLE(2, std::vector<Bitboard>(64)), KNIGHT_ATTACK_TABLE(64),
+                                 KING_ATTACK_TABLE(64), ROOK_ATTACK_TABLE(64, std::vector<Bitboard>(4096)),
+                                 BISHOP_ATTACK_TABLE(64, std::vector<Bitboard>(512))
 {
     initialise_leaper_piece_attack_tables();
 }
@@ -177,4 +180,21 @@ Bitboard MoveGenerator::generate_bishop_attack_mask_from_square(int square)
     return attack_mask;
 }
 
+// void MoveGenerator::initialise_rook_attack_table()
+// {
+//     for (int square = 0; square < 64; square++)
+//     {
+//         auto mask = ROOK_ATTACK_MASKS[square];
+//         auto shift_bits = ROOK_SHIFT_BITS[square];
+//         int num_of_blocker_boards = 1 << shift_bits;
+//
+//         // generate blockjer board and populate table
+//         for (int i = 0; i < num_of_blocker_boards; i++)
+//         {
+//             Bitboard blocker_board = generate_blocker_board(i, shift_bits, mask);
+//             int magic_index = (int)(blocker_board * ROOK_MAGICS[square]) >> (64 - shift_bits);
+//             ROOK_ATTACK_TABLE[square][magic_index] = generate_rook_attack_map_with_blockers(square, blocker_board);
+//         }
+//     }
+// }
 
