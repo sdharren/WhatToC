@@ -1,22 +1,20 @@
 
 #include <iostream>
 
-#include "helpers/bit_helpers.h"
-#include "movegen/move_gen.h"
+#include "board/Board.h"
+
 
 int main()
 {
-    auto x = MoveGenerator();
-    Bitboard blocker = 0;
-    set_bit(blocker, 59);
-    set_bit(blocker, 54);
-    set_bit(blocker, 43);
-    set_bit(blocker, 30);
-    set_bit(blocker, 13);
-    set_bit(blocker, 0);
-    // print(blocker);
-    // print(blocker);
-    print(x.generate_rook_attack_from_square(27, blocker));
-    print(x.generate_bishop_attack_from_square(27, blocker));
-    print(x.generate_queen_attack_from_square(27, blocker));
+    auto board = Board();
+    board.parse_FEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 17 45");
+    for (int i = K; i <= p; i++)
+    {
+        print(board.piece_bitboards[i]);
+    }
+    std::cout << board.side_to_move << std::endl;
+    std::cout << board.castling_rights << std::endl;
+    std::cout << board.ep_square << std::endl;
+    std::cout << board.halfmove_clock << std::endl;
+    std::cout << board.fullmove_counter << std::endl;
 }
