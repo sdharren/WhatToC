@@ -13,6 +13,8 @@ MoveGenerator::MoveGenerator() : PAWN_ATTACK_TABLE(2, std::vector<Bitboard>(64))
                                  BISHOP_ATTACK_TABLE(64, std::vector<Bitboard>(512))
 {
     initialise_leaper_piece_attack_tables();
+    initialise_rook_attack_table();
+    initialise_bishop_attack_table();
 }
 
 Bitboard MoveGenerator::generate_king_attack_from_square(int square)
@@ -180,21 +182,67 @@ Bitboard MoveGenerator::generate_bishop_attack_mask_from_square(int square)
     return attack_mask;
 }
 
-// void MoveGenerator::initialise_rook_attack_table()
-// {
-//     for (int square = 0; square < 64; square++)
-//     {
-//         auto mask = ROOK_ATTACK_MASKS[square];
-//         auto shift_bits = ROOK_SHIFT_BITS[square];
-//         int num_of_blocker_boards = 1 << shift_bits;
-//
-//         // generate blockjer board and populate table
-//         for (int i = 0; i < num_of_blocker_boards; i++)
-//         {
-//             Bitboard blocker_board = generate_blocker_board(i, shift_bits, mask);
-//             int magic_index = (int)(blocker_board * ROOK_MAGICS[square]) >> (64 - shift_bits);
-//             ROOK_ATTACK_TABLE[square][magic_index] = generate_rook_attack_map_with_blockers(square, blocker_board);
-//         }
-//     }
-// }
+void MoveGenerator::initialise_rook_attack_table()
+{
+    for (int square = 0; square < 64; square++)
+    {
+        auto mask = ROOK_ATTACK_MASKS[square];
+        auto shift_bits = ROOK_SHIFT_BITS[square];
+        int num_of_blocker_boards = 1 << shift_bits;
 
+        // generate blocker board and populate table
+        for (int i = 0; i < num_of_blocker_boards; i++)
+        {
+            Bitboard blocker_board = generate_blocker_board(i, shift_bits, mask);
+            int magic_index = (blocker_board * ROOK_MAGICS[square]) >> (64 - shift_bits);
+            ROOK_ATTACK_TABLE[square][magic_index] = generate_rook_attack_map_with_blockers(square, blocker_board);
+        }
+    }
+}
+
+void MoveGenerator::initialise_bishop_attack_table()
+{
+    for (int square = 0; square < 64; square++)
+    {
+        auto mask = BISHOP_ATTACK_MASKS[square];
+        auto shift_bits = BISHOP_SHIFT_BITS[square];
+        int num_of_blocker_boards = 1 << shift_bits;
+
+        // generate blocker board and populate table
+        for (int i = 0; i < num_of_blocker_boards; i++)
+        {
+            Bitboard blocker_board = generate_blocker_board(i, shift_bits, mask);
+            int magic_index = (blocker_board * BISHOP_MAGICS[square]) >> (64 - shift_bits);
+            BISHOP_ATTACK_TABLE[square][magic_index] = generate_bishop_attack_map_with_blockers(square, blocker_board);
+        }
+    }
+}
+
+Bitboard MoveGenerator::generate_rook_attack_from_square(int square, Bitboard occupancy)
+{
+    auto mask = ROOK_ATTACK_MASKS[square];
+    mask &= occupancy;
+    int magic_index = (mask * ROOK_MAGICS[square]) >> (64 - ROOK_SHIFT_BITS[square]);
+    return ROOK_ATTACK_TABLE[square][magic_index];
+}
+
+Bitboard MoveGenerator::generate_bishop_attack_from_square(int square, Bitboard occupancy)
+{
+    auto mask = BISHOP_ATTACK_MASKS[square];
+    mask &= occupancy;
+    int magic_index = (mask * BISHOP_MAGICS[square]) >> (64 - BISHOP_SHIFT_BITS[square]);
+    return BISHOP_ATTACK_TABLE[square][magic_index];
+}
+
+Bitboard MoveGenerator::generate_queen_attack_from_square(int square, Bitboard occupancy)
+{
+    auto mask = ROOK_ATTACK_MASKS[square];
+    mask &= occupancy;
+    int magic_index = (mask * ROOK_MAGICS[square]) >> (64 - ROOK_SHIFT_BITS[square]);
+    auto queen_attack = ROOK_ATTACK_TABLE[square][magic_index];
+
+    mask = BISHOP_ATTACK_MASKS[square];
+    mask &= occupancy;
+    magic_index = (mask * BISHOP_MAGICS[square]) >> (64 - BISHOP_SHIFT_BITS[square]);
+    return queen_attack | BISHOP_ATTACK_TABLE[square][magic_index];
+}

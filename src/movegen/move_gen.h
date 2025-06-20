@@ -109,8 +109,11 @@ public:
     Bitboard generate_king_attack_from_square(int square);
     Bitboard generate_rook_attack_mask_from_square(int square);
     Bitboard generate_bishop_attack_mask_from_square(int square);
-    // void initialise_rook_attack_table();
-    // void initialise_bishop_attack_table();
+    void initialise_rook_attack_table();
+    void initialise_bishop_attack_table();
+    Bitboard generate_rook_attack_from_square(int square, Bitboard occupancy);
+    Bitboard generate_bishop_attack_from_square(int square, Bitboard occupancy);
+    Bitboard generate_queen_attack_from_square(int square, Bitboard occupancy);
 };
 
 #endif //MOVE_GEN_H
