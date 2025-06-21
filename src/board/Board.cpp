@@ -130,3 +130,71 @@ void Board::parse_FEN(std::string FEN_string)
     fullmove_counter = std::stoi(fields[5]);
 
 }
+
+void Board::put_piece(int piece, int square)
+{
+    // set piece on bitboard
+    set_bit(piece_bitboards[piece], square);
+
+    // update zobrist key
+    zobrist_key = zobrist_randoms.piece_randoms[piece][square];
+
+    // update evaluation TODO
+}
+
+void Board::remove_piece(int piece, int square)
+{
+    // remove piece on bitboard
+    reset_bit(piece_bitboards[piece], square);
+
+    // update zobrist key
+    zobrist_key = zobrist_randoms.piece_randoms[piece][square];
+
+    // update evaluation TODO
+}
+
+void Board::move_piece(int piece, int start_square, int target_square)
+{
+    // remove piece
+    remove_piece(piece, start_square);
+
+    // put piece
+    put_piece(piece, target_square);
+}
+
+void Board::set_ep_square(int square)
+{
+    // remove current ep from zobrist
+    zobrist_key ^= zobrist_randoms.ep_square_randoms[ep_square];
+
+    // set eq square
+    ep_square = square;
+
+    // add new ep to zobrist
+    zobrist_key ^= zobrist_randoms.ep_square_randoms[ep_square];
+}
+
+void Board::swap_side()
+{
+    // remove from zobrist
+    zobrist_key ^= zobrist_randoms.side_to_move_randoms[side_to_move];
+
+    // change side
+    side_to_move ^= 1;
+
+    // update zobrist
+    zobrist_key ^= zobrist_randoms.side_to_move_randoms[side_to_move];
+}
+
+void Board::update_castling_rights(int start_square, int target_square)
+{
+    // remove from zobrist
+    zobrist_key ^= zobrist_randoms.castling_rights_randoms[castling_rights];
+
+    // update castling rights
+    castling_rights &= CASTLING_RIGHTS[start_square];
+    castling_rights &= CASTLING_RIGHTS[target_square];
+
+    // update zobrist
+    zobrist_key ^= zobrist_randoms.castling_rights_randoms[castling_rights];
+}
