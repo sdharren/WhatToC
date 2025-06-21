@@ -13,6 +13,7 @@ public:
     Bitboard white_occupancy;
     Bitboard black_occupancy;
     Bitboard occupied_squares;
+    std::vector<int> piece_list;
 
     int side_to_move;
     int castling_rights;

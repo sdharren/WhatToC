@@ -7,7 +7,8 @@
 #include "../helpers/bit_helpers.h"
 
 Board::Board() : piece_bitboards(12), white_occupancy(0), black_occupancy(0), occupied_squares(0), side_to_move(0),
-                 castling_rights(0), ep_square(no_sq), halfmove_clock(0), fullmove_counter(0)
+                 castling_rights(0), piece_list(64), ep_square(no_sq), halfmove_clock(0), fullmove_counter(0),
+                 zobrist_randoms(ZobristRandoms()), zobrist_key(0)
 {
 
 }
@@ -32,6 +33,7 @@ void print(Bitboard bitboard)
 
 void Board::parse_FEN(std::string FEN_string)
 {
+    std::fill(piece_list.begin(), piece_list.end(), 12);
     // split string by space
     std::string s;
     std::stringstream ss(FEN_string);
@@ -66,7 +68,15 @@ void Board::parse_FEN(std::string FEN_string)
             {
                 int piece = char_to_piece[c];
                 int square = (rank_index * 8) + file_index;
+
+                // set piece in piece_list
+                piece_list[square] = piece;
+
+                // set piece on bitboard
                 set_bit(piece_bitboards[piece], square);
+
+                // update zobrist key
+                zobrist_key ^= zobrist_randoms.piece_randoms[piece][square];
                 file_index++;
             }
         }
@@ -90,6 +100,7 @@ void Board::parse_FEN(std::string FEN_string)
 
     // parse side to move
     side_to_move = fields[1] == "w" ? 0 : 1;
+    zobrist_key ^= zobrist_randoms.side_to_move_randoms[side_to_move];
 
     // parse castling rights
     if (fields[2] == "-")
@@ -106,15 +117,16 @@ void Board::parse_FEN(std::string FEN_string)
             if (c == 'q') castling_rights |= 1;
         }
     }
+    zobrist_key ^= zobrist_randoms.castling_rights_randoms[castling_rights];
 
     // parse en passant square
     ep_square = char_to_sq[fields[3]];
+    zobrist_key ^= zobrist_randoms.ep_square_randoms[ep_square];
 
     // parse halfmove clock
     halfmove_clock = std::stoi(fields[4]);
 
     // parse fullmove counter
     fullmove_counter = std::stoi(fields[5]);
-
 
 }

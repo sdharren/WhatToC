@@ -2,7 +2,7 @@
 
 #include "../helpers/prng.h"
 
-ZobristRandoms::ZobristRandoms() : piece_randoms(12, std::vector<Bitboard>(64)), ep_square_randoms(64),
+ZobristRandoms::ZobristRandoms() : piece_randoms(12, std::vector<Bitboard>(64)), ep_square_randoms(65),
                                    castling_rights_randoms(16), side_to_move_randoms(2)
 {
     init_piece_randoms();
@@ -24,7 +24,7 @@ void ZobristRandoms::init_piece_randoms()
 
 void ZobristRandoms::init_ep_square_randoms()
 {
-    for (int square = 0; square < 64; square++)
+    for (int square = 0; square < 65; square++)
     {
         ep_square_randoms[square] = get_random_64();
     }
