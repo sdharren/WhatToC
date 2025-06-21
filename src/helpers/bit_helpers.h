@@ -1,6 +1,6 @@
 #ifndef BIT_HELPERS_H
 #define BIT_HELPERS_H
-#include "../board/Board.h"
+#include "board_defs.h"
 
 Bitboard get_bit(Bitboard bitboard, int square);
 

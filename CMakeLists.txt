@@ -14,4 +14,5 @@ add_executable(WhatToC src/main.cpp
         src/movegen/move_gen.h
         src/movegen/find_magics.cpp
         src/movegen/find_magics.h
+        src/helpers/board_defs.h
 )

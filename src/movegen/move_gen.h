@@ -4,7 +4,7 @@
 #include <array>
 #include <vector>
 
-#include "../board/Board.h"
+#include "../helpers/board_defs.h"
 
 inline std::array<Bitboard, 64> ROOK_MAGICS = {
     0x8a80104000800020ULL, 0x140002000100040ULL, 0x2801880a0017001ULL, 0x100081001000420ULL, 0x200020010080420ULL,

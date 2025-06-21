@@ -1,6 +1,6 @@
 #ifndef FIND_MAGICS_H
 #define FIND_MAGICS_H
-#include "../board/Board.h"
+#include "../helpers/board_defs.h"
 
 
 Bitboard generate_blocker_board(int index, int num_of_blockers, Bitboard attack_mask);
