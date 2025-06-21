@@ -1,6 +1,8 @@
 #ifndef BOARD_H
 #define BOARD_H
 #include <vector>
+
+#include "ZobristRandoms.h"
 #include "../helpers/board_defs.h"
 
 // Board class
@@ -11,11 +13,15 @@ public:
     Bitboard white_occupancy;
     Bitboard black_occupancy;
     Bitboard occupied_squares;
+
     int side_to_move;
     int castling_rights;
     int ep_square;
     int halfmove_clock;
     int fullmove_counter;
+
+    ZobristRandoms zobrist_randoms;
+    Bitboard zobrist_key;
 
     Board();
     void parse_FEN(std::string FEN_string);

@@ -15,4 +15,6 @@ add_executable(WhatToC src/main.cpp
         src/movegen/find_magics.cpp
         src/movegen/find_magics.h
         src/helpers/board_defs.h
+        src/board/ZobristRandoms.cpp
+        src/board/ZobristRandoms.h
 )
