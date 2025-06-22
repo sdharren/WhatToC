@@ -21,6 +21,17 @@ WhatToDo, but with better planning, additional features, and in C++ because Pyth
   - update castling rights
   - increment Zobrist and evaluation methods on each "move"
 - finish generating all pseudolegal moves
+  - Create Move and Move_list
+  - for queen, knight, bishop, rook:
+    - split into quiet moves, capture moves
+  - for king
+    - quiet moves, capture moves
+    - castling moves
+  - for pawns
+    - quiet moves
+      - single push, double push, pawn promotion
+    - capture moves
+      - regular capture, promotion capture, ep capture
 - finish move gen
 - add perft testing <--------- FIRST MILESTONE (doesn't need evaluation, or board state really tbh but whatever)
 
