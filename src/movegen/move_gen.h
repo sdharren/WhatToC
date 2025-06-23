@@ -4,6 +4,7 @@
 #include <array>
 #include <vector>
 
+#include "move.h"
 #include "../helpers/board_defs.h"
 
 inline std::array<Bitboard, 64> ROOK_MAGICS = {
@@ -109,11 +110,15 @@ public:
     Bitboard generate_king_attack_from_square(int square);
     Bitboard generate_rook_attack_mask_from_square(int square);
     Bitboard generate_bishop_attack_mask_from_square(int square);
+
     void initialise_rook_attack_table();
     void initialise_bishop_attack_table();
+
     Bitboard generate_rook_attack_from_square(int square, Bitboard occupancy);
     Bitboard generate_bishop_attack_from_square(int square, Bitboard occupancy);
     Bitboard generate_queen_attack_from_square(int square, Bitboard occupancy);
+
+    std::pair<std::vector<Move>, int>generate_all_pseudolegal_moves();
 };
 
 #endif //MOVE_GEN_H

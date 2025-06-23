@@ -246,3 +246,45 @@ Bitboard MoveGenerator::generate_queen_attack_from_square(int square, Bitboard o
     magic_index = (mask * BISHOP_MAGICS[square]) >> (64 - BISHOP_SHIFT_BITS[square]);
     return queen_attack | BISHOP_ATTACK_TABLE[square][magic_index];
 }
+
+std::pair<std::vector<Move>, int> MoveGenerator::generate_all_pseudolegal_moves()
+{
+    // initialise return variables
+    std::vector<Move> move_list(256);
+    int move_count = 0;
+
+    // generate rook moves
+    // captures
+
+    // quiets
+
+    // generate bishop moves
+
+    // generate queen moves
+
+    // generate knight moves
+
+    // generate king moves
+    // captures
+
+    // quiets
+
+    // castling
+
+    // generate pawn moves
+    // captures
+    // regular
+
+    // promotion
+
+    // ep
+
+    // quiets
+    // single push
+
+    // double push
+
+    // promotion
+
+    return std::make_pair(move_list, move_count);
+}
