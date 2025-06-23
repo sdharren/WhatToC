@@ -35,7 +35,8 @@ WhatToDo, but with better planning, additional features, and in C++ because Pyth
 - finish move gen
 - add perft testing <--------- FIRST MILESTONE (doesn't need evaluation, or board state really tbh but whatever)
 
+# Minimax, Negamax, Alpha-Beta pruning
+- 
 
-
-- being search understanding 
-- read up on evaluation? 
+# Evalution
+- 
