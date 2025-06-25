@@ -95,6 +95,11 @@ inline std::array<int, 64> BISHOP_SHIFT_BITS = {
     6, 5, 5, 5, 5, 5, 5, 6,
 };
 
+inline Bitboard RANK_8_MASK = 0xff00000000000000;
+inline Bitboard RANK_1_MASK = 0xff;
+inline Bitboard RANK_2_MASK = 0xff00;
+inline Bitboard RANK_7_MASK = 0xff000000000000;
+
 class MoveGenerator
 {
 public:
@@ -123,6 +128,7 @@ public:
     void generate_piece_pseudolegal_moves(std::vector<Move> &move_list, int &move_count, Board &board, int piece);
     void generate_castling_pseudolegal_moves(std::vector<Move> &move_list, int &move_count, Board &board);
     bool is_square_attacked_by_colour(int square, int colour, Board &board);
+    void generate_pawn_pseudolegal_moves(std::vector<Move> &move_list, int &move_count, Board &board);
 
 };
 
