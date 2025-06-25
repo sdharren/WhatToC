@@ -247,7 +247,7 @@ Bitboard MoveGenerator::generate_queen_attack_from_square(int square, Bitboard o
     return queen_attack | BISHOP_ATTACK_TABLE[square][magic_index];
 }
 
-void MoveGenerator::generate_slider_pseudolegal_moves(std::vector<Move> &move_list, int &move_count, Board &board,
+void MoveGenerator::generate_piece_pseudolegal_moves(std::vector<Move> &move_list, int &move_count, Board &board,
                                                       int piece)
 {
     int side = board.side_to_move == white ? 0 : 6;
@@ -262,14 +262,21 @@ void MoveGenerator::generate_slider_pseudolegal_moves(std::vector<Move> &move_li
         Bitboard attack_squares;
         switch (piece)
         {
+            case K:
+                attack_squares = KING_ATTACK_TABLE[start_square];
+                break;
+            case Q:
+                attack_squares = generate_queen_attack_from_square(start_square, board.occupied_squares);
+                break;
             case R:
                 attack_squares = generate_rook_attack_from_square(start_square, board.occupied_squares);
                 break;
             case B:
                 attack_squares = generate_bishop_attack_from_square(start_square, board.occupied_squares);
                 break;
-            case Q:
-                attack_squares = generate_queen_attack_from_square(start_square, board.occupied_squares);
+            case N:
+                attack_squares = KNIGHT_ATTACK_TABLE[start_square];
+                break;
         }
         attack_squares &= ~player_bitboard;
         while (attack_squares)
@@ -305,20 +312,19 @@ std::pair<std::vector<Move>, int> MoveGenerator::generate_all_pseudolegal_moves(
     int move_count = 0;
 
     // generate rook moves
-    generate_slider_pseudolegal_moves(move_list, move_count, board, R);
+    generate_piece_pseudolegal_moves(move_list, move_count, board, R);
 
     // generate bishop moves
-    generate_slider_pseudolegal_moves(move_list, move_count, board, B);
+    generate_piece_pseudolegal_moves(move_list, move_count, board, B);
 
     // generate queen moves
-    generate_slider_pseudolegal_moves(move_list, move_count, board, Q);
+    generate_piece_pseudolegal_moves(move_list, move_count, board, Q);
 
     // generate knight moves
+    generate_piece_pseudolegal_moves(move_list, move_count, board, N);
 
     // generate king moves
-    // captures
-
-    // quiets
+    generate_piece_pseudolegal_moves(move_list, move_count, board, K);
 
     // castling
 

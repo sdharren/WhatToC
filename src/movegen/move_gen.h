@@ -120,7 +120,8 @@ public:
     Bitboard generate_queen_attack_from_square(int square, Bitboard occupancy);
 
     std::pair<std::vector<Move>, int>generate_all_pseudolegal_moves(Board &board);
-    void generate_slider_pseudolegal_moves(std::vector<Move> &move_list, int &move_count, Board &board, int piece);
+    void generate_piece_pseudolegal_moves(std::vector<Move> &move_list, int &move_count, Board &board, int piece);
+
 };
 
 #endif //MOVE_GEN_H
