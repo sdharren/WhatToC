@@ -2,12 +2,12 @@
 #include <iostream>
 
 #include "board/Board.h"
-
+#include "movegen/move_gen.h"
 
 int main()
 {
     auto board = Board();
-    board.parse_FEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0");
+    board.parse_FEN("rnbqkbnr/pppppppp/8/8/8/8/1PP1PPPP/RNBQKBNR w KQkq - 0 0");
     // for (int i = K; i <= p; i++)
     // {
     //     print(board.piece_bitboards[i]);
@@ -28,9 +28,12 @@ int main()
     //         std::cout << std::endl;
     //     }
     // }
-    board.move_piece(K, e1, e2);
-    print(board.piece_bitboards[K]);
-    std::cout << board.castling_rights << std::endl;
-    board.update_castling_rights(h1, h3);
-    std::cout << board.castling_rights << std::endl;
+//    board.move_piece(K, e1, e2);
+//    print(board.piece_bitboards[K]);
+//    std::cout << board.castling_rights << std::endl;
+//    board.update_castling_rights(h1, h3);
+//    std::cout << board.castling_rights << std::endl;
+    auto move_gen = MoveGenerator();
+    auto x = move_gen.generate_all_pseudolegal_moves(board);
+    std::cout << x.second;
 }

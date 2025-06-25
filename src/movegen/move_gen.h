@@ -6,6 +6,7 @@
 
 #include "move.h"
 #include "../helpers/board_defs.h"
+#include "../board/Board.h"
 
 inline std::array<Bitboard, 64> ROOK_MAGICS = {
     0x8a80104000800020ULL, 0x140002000100040ULL, 0x2801880a0017001ULL, 0x100081001000420ULL, 0x200020010080420ULL,
@@ -118,7 +119,8 @@ public:
     Bitboard generate_bishop_attack_from_square(int square, Bitboard occupancy);
     Bitboard generate_queen_attack_from_square(int square, Bitboard occupancy);
 
-    std::pair<std::vector<Move>, int>generate_all_pseudolegal_moves();
+    std::pair<std::vector<Move>, int>generate_all_pseudolegal_moves(Board &board);
+    void generate_slider_pseudolegal_moves(std::vector<Move> &move_list, int &move_count, Board &board, int piece);
 };
 
 #endif //MOVE_GEN_H

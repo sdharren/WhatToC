@@ -247,20 +247,71 @@ Bitboard MoveGenerator::generate_queen_attack_from_square(int square, Bitboard o
     return queen_attack | BISHOP_ATTACK_TABLE[square][magic_index];
 }
 
-std::pair<std::vector<Move>, int> MoveGenerator::generate_all_pseudolegal_moves()
+void MoveGenerator::generate_slider_pseudolegal_moves(std::vector<Move> &move_list, int &move_count, Board &board,
+                                                      int piece)
+{
+    int side = board.side_to_move == white ? 0 : 6;
+    Bitboard& player_bitboard = board.side_to_move == white ? board.white_occupancy : board.black_occupancy;
+    Bitboard& opponent_bitboard = board.side_to_move == white ? board.black_occupancy : board.white_occupancy;
+
+    Bitboard bitboard = board.piece_bitboards[piece + side];
+    while (bitboard)
+    {
+        // get start square
+        int start_square = get_LS1B(bitboard);
+        Bitboard attack_squares;
+        switch (piece)
+        {
+            case R:
+                attack_squares = generate_rook_attack_from_square(start_square, board.occupied_squares);
+                break;
+            case B:
+                attack_squares = generate_bishop_attack_from_square(start_square, board.occupied_squares);
+                break;
+            case Q:
+                attack_squares = generate_queen_attack_from_square(start_square, board.occupied_squares);
+        }
+        attack_squares &= ~player_bitboard;
+        while (attack_squares)
+        {
+            // get target square
+            int target_square = get_LS1B(attack_squares);
+
+            // capture
+            if (get_bit(opponent_bitboard, target_square))
+            {
+                move_list[move_count] = create_move(start_square, target_square, 0b0100);
+            }
+            // quiet
+            else
+            {
+                move_list[move_count] = create_move(start_square, target_square, 0b0);
+            }
+            move_count++;
+
+            attack_squares &= attack_squares - 1;
+        }
+
+        // pop current bit
+        bitboard &= bitboard - 1;
+    }
+
+}
+
+std::pair<std::vector<Move>, int> MoveGenerator::generate_all_pseudolegal_moves(Board &board)
 {
     // initialise return variables
     std::vector<Move> move_list(256);
     int move_count = 0;
 
     // generate rook moves
-    // captures
-
-    // quiets
+    generate_slider_pseudolegal_moves(move_list, move_count, board, R);
 
     // generate bishop moves
+    generate_slider_pseudolegal_moves(move_list, move_count, board, B);
 
     // generate queen moves
+    generate_slider_pseudolegal_moves(move_list, move_count, board, Q);
 
     // generate knight moves
 
