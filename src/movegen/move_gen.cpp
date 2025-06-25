@@ -305,6 +305,77 @@ void MoveGenerator::generate_piece_pseudolegal_moves(std::vector<Move> &move_lis
 
 }
 
+bool MoveGenerator::is_square_attacked_by_colour(int square, int colour, Board &board)
+{
+    Bitboard attack_squares;
+    int side = colour == white ? 0 : 6;
+    // attacked by rook
+    attack_squares = generate_rook_attack_from_square(square, board.occupied_squares);
+    if (attack_squares & board.piece_bitboards[R + side]) return true;
+
+    // attacked by bishop
+    attack_squares = generate_bishop_attack_from_square(square, board.occupied_squares);
+    if (attack_squares & board.piece_bitboards[B + side]) return true;
+
+    // attacked by queen
+    attack_squares = generate_queen_attack_from_square(square, board.occupied_squares);
+    if (attack_squares & board.piece_bitboards[Q + side]) return true;
+
+    // attacked by knight
+    attack_squares = KNIGHT_ATTACK_TABLE[square];
+    if (attack_squares & board.piece_bitboards[N + side]) return true;
+
+    // attacked by pawn
+    attack_squares = PAWN_ATTACK_TABLE[colour ^ 1][square];
+    if (attack_squares & board.piece_bitboards[P + side]) return true;
+
+    // attacked by king
+    attack_squares = KING_ATTACK_TABLE[square];
+    if (attack_squares & board.piece_bitboards[K + side]) return true;
+
+    return false;
+}
+
+void MoveGenerator::generate_castling_pseudolegal_moves(std::vector<Move> &move_list, int &move_count, Board &board)
+{
+    int side = board.side_to_move == white ? 0 : 6;
+    int opponent = 1 ^ board.side_to_move;
+    auto rights = board.side_to_move == white ? board.castling_rights >> 2 : board.castling_rights;
+
+    Bitboard bitboard = board.piece_bitboards[K + side];
+    while (bitboard)
+    {
+        int start_square = get_LS1B(bitboard);
+        // kingside
+        if (rights & 0b10)
+        {
+            if (!is_square_attacked_by_colour(start_square, opponent, board) &&
+                !is_square_attacked_by_colour(start_square + 1, opponent, board) &&
+                !get_bit(board.occupied_squares, start_square + 1) &&
+                !get_bit(board.occupied_squares, start_square + 2))
+            {
+                move_list[move_count] = create_move(start_square, start_square + 2, 0b10);
+                move_count++;
+            }
+        }
+        // queenside
+        if (rights & 0b1)
+        {
+            if (!is_square_attacked_by_colour(start_square, opponent, board) &&
+                !is_square_attacked_by_colour(start_square - 1, opponent, board) &&
+                !get_bit(board.occupied_squares, start_square - 1) &&
+                !get_bit(board.occupied_squares, start_square - 2) &&
+                !get_bit(board.occupied_squares, start_square - 3))
+            {
+                move_list[move_count] = create_move(start_square, start_square - 2, 0b11);
+                move_count++;
+            }
+        }
+
+        bitboard &= bitboard - 1;
+    }
+}
+
 std::pair<std::vector<Move>, int> MoveGenerator::generate_all_pseudolegal_moves(Board &board)
 {
     // initialise return variables
@@ -327,6 +398,7 @@ std::pair<std::vector<Move>, int> MoveGenerator::generate_all_pseudolegal_moves(
     generate_piece_pseudolegal_moves(move_list, move_count, board, K);
 
     // castling
+    generate_castling_pseudolegal_moves(move_list, move_count, board);
 
     // generate pawn moves
     // captures

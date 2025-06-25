@@ -7,7 +7,7 @@
 int main()
 {
     auto board = Board();
-    board.parse_FEN("rnbqkbnr/pppppppp/8/8/8/8/1PP1PPPP/RNBQKBNR w KQkq - 0 0");
+    board.parse_FEN("r1bqk2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R b KQkq - 0 1");
     // for (int i = K; i <= p; i++)
     // {
     //     print(board.piece_bitboards[i]);

@@ -121,6 +121,8 @@ public:
 
     std::pair<std::vector<Move>, int>generate_all_pseudolegal_moves(Board &board);
     void generate_piece_pseudolegal_moves(std::vector<Move> &move_list, int &move_count, Board &board, int piece);
+    void generate_castling_pseudolegal_moves(std::vector<Move> &move_list, int &move_count, Board &board);
+    bool is_square_attacked_by_colour(int square, int colour, Board &board);
 
 };
 
