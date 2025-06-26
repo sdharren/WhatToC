@@ -6,9 +6,8 @@
 
 #include "../helpers/bit_helpers.h"
 
-Board::Board() : piece_bitboards(12), white_occupancy(0), black_occupancy(0), occupied_squares(0), side_to_move(0),
-                 castling_rights(0), piece_list(64), ep_square(no_sq), halfmove_clock(0), fullmove_counter(0),
-                 zobrist_randoms(ZobristRandoms()), zobrist_key(0)
+Board::Board() : piece_bitboards(12), white_occupancy(0), black_occupancy(0), occupied_squares(0), piece_list(64),
+                 game_state(GameState()), zobrist_randoms(ZobristRandoms())
 {
 
 }
@@ -76,7 +75,7 @@ void Board::parse_FEN(std::string FEN_string)
                 set_bit(piece_bitboards[piece], square);
 
                 // update zobrist key
-                zobrist_key ^= zobrist_randoms.piece_randoms[piece][square];
+                game_state.zobrist_key ^= zobrist_randoms.piece_randoms[piece][square];
                 file_index++;
             }
         }
@@ -99,35 +98,35 @@ void Board::parse_FEN(std::string FEN_string)
     occupied_squares |= black_occupancy;
 
     // parse side to move
-    side_to_move = fields[1] == "w" ? 0 : 1;
-    zobrist_key ^= zobrist_randoms.side_to_move_randoms[side_to_move];
+    game_state.side_to_move = fields[1] == "w" ? 0 : 1;
+    game_state.zobrist_key ^= zobrist_randoms.side_to_move_randoms[game_state.side_to_move];
 
     // parse castling rights
     if (fields[2] == "-")
     {
-        castling_rights = 0;
+        game_state.castling_rights = 0;
     }
     else
     {
         for (auto c: fields[2])
         {
-            if (c == 'K') castling_rights |= (1 << 3);
-            if (c == 'Q') castling_rights |= (1 << 2);
-            if (c == 'k') castling_rights |= (1 << 1);
-            if (c == 'q') castling_rights |= 1;
+            if (c == 'K') game_state.castling_rights |= (1 << 3);
+            if (c == 'Q') game_state.castling_rights |= (1 << 2);
+            if (c == 'k') game_state.castling_rights |= (1 << 1);
+            if (c == 'q') game_state.castling_rights |= 1;
         }
     }
-    zobrist_key ^= zobrist_randoms.castling_rights_randoms[castling_rights];
+    game_state.zobrist_key ^= zobrist_randoms.castling_rights_randoms[game_state.castling_rights];
 
     // parse en passant square
-    ep_square = char_to_sq[fields[3]];
-    zobrist_key ^= zobrist_randoms.ep_square_randoms[ep_square];
+    game_state.ep_square = char_to_sq[fields[3]];
+    game_state.zobrist_key ^= zobrist_randoms.ep_square_randoms[game_state.ep_square];
 
     // parse halfmove clock
-    halfmove_clock = std::stoi(fields[4]);
+    game_state.halfmove_clock = std::stoi(fields[4]);
 
     // parse fullmove counter
-    fullmove_counter = std::stoi(fields[5]);
+    game_state.fullmove_counter = std::stoi(fields[5]);
 
 }
 
@@ -137,7 +136,10 @@ void Board::put_piece(int piece, int square)
     set_bit(piece_bitboards[piece], square);
 
     // update zobrist key
-    zobrist_key = zobrist_randoms.piece_randoms[piece][square];
+    game_state.zobrist_key = zobrist_randoms.piece_randoms[piece][square];
+
+    // update piece list
+    piece_list[square] = piece;
 
     // update evaluation TODO
 }
@@ -148,7 +150,10 @@ void Board::remove_piece(int piece, int square)
     reset_bit(piece_bitboards[piece], square);
 
     // update zobrist key
-    zobrist_key = zobrist_randoms.piece_randoms[piece][square];
+    game_state.zobrist_key = zobrist_randoms.piece_randoms[piece][square];
+
+    // update piece list
+    piece_list[square] = 12;
 
     // update evaluation TODO
 }
@@ -165,36 +170,212 @@ void Board::move_piece(int piece, int start_square, int target_square)
 void Board::set_ep_square(int square)
 {
     // remove current ep from zobrist
-    zobrist_key ^= zobrist_randoms.ep_square_randoms[ep_square];
+    game_state.zobrist_key ^= zobrist_randoms.ep_square_randoms[game_state.ep_square];
 
     // set eq square
-    ep_square = square;
+    game_state.ep_square = square;
 
     // add new ep to zobrist
-    zobrist_key ^= zobrist_randoms.ep_square_randoms[ep_square];
+    game_state.zobrist_key ^= zobrist_randoms.ep_square_randoms[game_state.ep_square];
 }
 
 void Board::swap_side()
 {
     // remove from zobrist
-    zobrist_key ^= zobrist_randoms.side_to_move_randoms[side_to_move];
+    game_state.zobrist_key ^= zobrist_randoms.side_to_move_randoms[game_state.side_to_move];
 
     // change side
-    side_to_move ^= 1;
+    game_state.side_to_move ^= 1;
 
     // update zobrist
-    zobrist_key ^= zobrist_randoms.side_to_move_randoms[side_to_move];
+    game_state.zobrist_key ^= zobrist_randoms.side_to_move_randoms[game_state.side_to_move];
 }
 
 void Board::update_castling_rights(int start_square, int target_square)
 {
     // remove from zobrist
-    zobrist_key ^= zobrist_randoms.castling_rights_randoms[castling_rights];
+    game_state.zobrist_key ^= zobrist_randoms.castling_rights_randoms[game_state.castling_rights];
 
     // update castling rights
-    castling_rights &= CASTLING_RIGHTS[start_square];
-    castling_rights &= CASTLING_RIGHTS[target_square];
+    game_state.castling_rights &= CASTLING_RIGHTS[start_square];
+    game_state.castling_rights &= CASTLING_RIGHTS[target_square];
 
     // update zobrist
-    zobrist_key ^= zobrist_randoms.castling_rights_randoms[castling_rights];
+    game_state.zobrist_key ^= zobrist_randoms.castling_rights_randoms[game_state.castling_rights];
+}
+
+bool Board::make_move(Move move)
+{
+    // copy history
+    auto current_game_state = game_state;
+    current_game_state.next_move = move;
+    history.push_back(current_game_state);
+
+    // get squares
+    int start_square = get_start_square(move);
+    int target_square = get_target_square(move);
+    int piece = piece_list[start_square];
+    int side = game_state.side_to_move == white ? 0 : 6;
+
+    // flags
+    int is_quiet = is_quiet_move(move);
+    int is_double_pawn_push = is_double_pawn_push_move(move);
+    int is_kingside_castle = is_kingside_castle_move(move);
+    int is_queenside_castle = is_queenside_castle_move(move);
+    int is_capture = is_capture_move(move);
+    int is_ep = is_ep_move(move);
+    int is_knight_promo = is_knight_promo_move(move);
+    int is_bishop_promo = is_bishop_promo_move(move);
+    int is_rook_promo = is_rook_promo_move(move);
+    int is_queen_promo = is_queen_promo_move(move);
+    int is_knight_capture_promo = is_knight_capture_promo_move(move);
+    int is_bishop_capture_promo = is_bishop_capture_promo_move(move);
+    int is_rook_capture_promo = is_rook_capture_promo_move(move);
+    int is_queen_capture_promo = is_queen_capture_promo_move(move);
+
+    // assume move increments halfmove counter
+    game_state.halfmove_clock++;
+
+    // reset ep square
+    game_state.ep_square = no_sq;
+
+    if (is_quiet)
+    {
+        move_piece(piece, start_square, target_square);
+        if (piece == P || piece == p)
+        {
+            game_state.halfmove_clock = 0;
+        }
+    }
+
+    if (is_double_pawn_push)
+    {
+        move_piece(piece, start_square, target_square);
+        game_state.halfmove_clock = 0;
+        int offset = game_state.side_to_move == white ? -1 : 1;
+        set_ep_square(target_square + (offset * 8));
+    }
+
+    if (is_kingside_castle)
+    {
+        move_piece(piece, start_square, target_square);
+        switch (target_square)
+        {
+            case g1:
+                move_piece(R, h1, f1);
+                break;
+            case g8:
+                move_piece(r, h8, f8);
+                break;
+        }
+    }
+
+    if (is_queenside_castle)
+    {
+        move_piece(piece, start_square, target_square);
+        switch (target_square)
+        {
+        case c1:
+            move_piece(R, a1, d1);
+            break;
+        case c8:
+            move_piece(r, a8, d8);
+            break;
+        }
+    }
+
+    if (is_capture)
+    {
+        int target_piece = piece_list[target_square];
+        move_piece(piece, start_square, target_square);
+        remove_piece(target_piece, target_square);
+        game_state.halfmove_clock = 0;
+    }
+
+    if (is_ep)
+    {
+        move_piece(piece, start_square, target_square);
+        int target_piece = game_state.side_to_move == white ? p : P;
+        remove_piece(target_piece, target_square);
+        game_state.halfmove_clock = 0;
+    }
+
+    if (is_knight_promo)
+    {
+        remove_piece(piece, start_square);
+        put_piece(N + side, target_square);
+        game_state.halfmove_clock = 0;
+    }
+
+    if (is_bishop_promo)
+    {
+        remove_piece(piece, start_square);
+        put_piece(B + side, target_square);
+        game_state.halfmove_clock = 0;
+    }
+
+    if (is_rook_promo)
+    {
+        remove_piece(piece, start_square);
+        put_piece(R + side, target_square);
+        game_state.halfmove_clock = 0;
+    }
+
+    if (is_queen_promo)
+    {
+        remove_piece(piece, start_square);
+        put_piece(Q + side, target_square);
+        game_state.halfmove_clock = 0;
+    }
+
+    if (is_knight_capture_promo)
+    {
+        int target_piece = piece_list[target_square];
+        remove_piece(piece, start_square);
+        remove_piece(target_piece, target_square);
+        put_piece(N + side, target_square);
+        game_state.halfmove_clock = 0;
+    }
+
+    if (is_bishop_capture_promo)
+    {
+        int target_piece = piece_list[target_square];
+        remove_piece(piece, start_square);
+        remove_piece(target_piece, target_square);
+        put_piece(B + side, target_square);
+        game_state.halfmove_clock = 0;
+    }
+
+    if (is_rook_capture_promo)
+    {
+        int target_piece = piece_list[target_square];
+        remove_piece(piece, start_square);
+        remove_piece(target_piece, target_square);
+        put_piece(R + side, target_square);
+        game_state.halfmove_clock = 0;
+    }
+
+    if (is_queen_capture_promo)
+    {
+        int target_piece = piece_list[target_square];
+        remove_piece(piece, start_square);
+        remove_piece(target_piece, target_square);
+        put_piece(Q + side, target_square);
+        game_state.halfmove_clock = 0;
+    }
+
+    // update castling rights
+    game_state.castling_rights &= CASTLING_RIGHTS[start_square];
+    game_state.castling_rights &= CASTLING_RIGHTS[target_square];
+
+    // increment fullmove counter
+    if (game_state.side_to_move == black) game_state.fullmove_counter++;
+
+    // swap side
+    game_state.side_to_move ^= 1;
+
+    // check if move is legal
+
+
+    return true;
 }

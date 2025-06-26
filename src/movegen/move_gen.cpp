@@ -252,9 +252,9 @@ Bitboard MoveGenerator::generate_queen_attack_from_square(int square, Bitboard o
 void MoveGenerator::generate_piece_pseudolegal_moves(std::vector<Move> &move_list, int &move_count, Board &board,
                                                       int piece)
 {
-    int side = board.side_to_move == white ? 0 : 6;
-    Bitboard& player_bitboard = board.side_to_move == white ? board.white_occupancy : board.black_occupancy;
-    Bitboard& opponent_bitboard = board.side_to_move == white ? board.black_occupancy : board.white_occupancy;
+    int side = board.game_state.side_to_move == white ? 0 : 6;
+    Bitboard& player_bitboard = board.game_state.side_to_move == white ? board.white_occupancy : board.black_occupancy;
+    Bitboard& opponent_bitboard = board.game_state.side_to_move == white ? board.black_occupancy : board.white_occupancy;
 
     Bitboard bitboard = board.piece_bitboards[piece + side];
     while (bitboard)
@@ -340,9 +340,9 @@ bool MoveGenerator::is_square_attacked_by_colour(int square, int colour, Board &
 
 void MoveGenerator::generate_castling_pseudolegal_moves(std::vector<Move> &move_list, int &move_count, Board &board)
 {
-    int side = board.side_to_move == white ? 0 : 6;
-    int opponent = 1 ^ board.side_to_move;
-    auto rights = board.side_to_move == white ? board.castling_rights >> 2 : board.castling_rights;
+    int side = board.game_state.side_to_move == white ? 0 : 6;
+    int opponent = 1 ^ board.game_state.side_to_move;
+    auto rights = board.game_state.side_to_move == white ? board.game_state.castling_rights >> 2 : board.game_state.castling_rights;
 
     Bitboard bitboard = board.piece_bitboards[K + side];
     while (bitboard)
@@ -380,11 +380,11 @@ void MoveGenerator::generate_castling_pseudolegal_moves(std::vector<Move> &move_
 
 void MoveGenerator::generate_pawn_pseudolegal_moves(std::vector<Move>& move_list, int& move_count, Board& board)
 {
-    int side = board.side_to_move == white ? 0 : 6;
-    int offset = board.side_to_move == white ? 1 : -1;
-    Bitboard& opponent_bitboard = board.side_to_move == white ? board.black_occupancy : board.white_occupancy;
-    Bitboard promotion_mask = board.side_to_move == white ? RANK_8_MASK : RANK_1_MASK;
-    Bitboard double_push_mask = board.side_to_move == white ? RANK_2_MASK : RANK_7_MASK;
+    int side = board.game_state.side_to_move == white ? 0 : 6;
+    int offset = board.game_state.side_to_move == white ? 1 : -1;
+    Bitboard& opponent_bitboard = board.game_state.side_to_move == white ? board.black_occupancy : board.white_occupancy;
+    Bitboard promotion_mask = board.game_state.side_to_move == white ? RANK_8_MASK : RANK_1_MASK;
+    Bitboard double_push_mask = board.game_state.side_to_move == white ? RANK_2_MASK : RANK_7_MASK;
 
     Bitboard bitboard = board.piece_bitboards[P + side];
 
@@ -392,7 +392,7 @@ void MoveGenerator::generate_pawn_pseudolegal_moves(std::vector<Move>& move_list
     {
         // get start square
         int start_square = get_LS1B(bitboard);
-        Bitboard attack_squares = PAWN_ATTACK_TABLE[board.side_to_move][start_square];
+        Bitboard attack_squares = PAWN_ATTACK_TABLE[board.game_state.side_to_move][start_square];
 
         while (attack_squares)
         {
@@ -421,9 +421,9 @@ void MoveGenerator::generate_pawn_pseudolegal_moves(std::vector<Move>& move_list
             }
 
             // en-passant capture
-            if (target_square == board.ep_square)
+            if (target_square == board.game_state.ep_square)
             {
-                move_list[move_count] = create_move(start_square, board.ep_square, 0b101);
+                move_list[move_count] = create_move(start_square, board.game_state.ep_square, 0b101);
                 move_count++;
             }
             attack_squares &= attack_squares - 1;

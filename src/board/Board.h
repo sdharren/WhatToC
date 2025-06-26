@@ -4,6 +4,7 @@
 
 #include "ZobristRandoms.h"
 #include "../helpers/board_defs.h"
+#include "../movegen/move.h"
 
 inline std::vector<int> CASTLING_RIGHTS = {
     11, 15, 15, 15, 3, 15, 15, 7,
@@ -16,6 +17,17 @@ inline std::vector<int> CASTLING_RIGHTS = {
     14, 15, 15, 15, 12, 15, 15, 13
 };
 
+struct GameState
+{
+    int side_to_move;
+    int castling_rights;
+    int ep_square;
+    int halfmove_clock;
+    int fullmove_counter;
+    Bitboard zobrist_key;
+    Move next_move;
+};
+
 // Board class
 class Board
 {
@@ -26,14 +38,10 @@ public:
     Bitboard occupied_squares;
     std::vector<int> piece_list;
 
-    int side_to_move;
-    int castling_rights;
-    int ep_square;
-    int halfmove_clock;
-    int fullmove_counter;
+    GameState game_state;
+    std::vector<GameState> history;
 
     ZobristRandoms zobrist_randoms;
-    Bitboard zobrist_key;
 
     Board();
     void parse_FEN(std::string FEN_string);
@@ -44,6 +52,8 @@ public:
     void set_ep_square(int square);
     void swap_side();
     void update_castling_rights(int start_square, int target_square);
+
+    bool make_move(Move move);
 };
 
 // print bitboard
