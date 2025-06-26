@@ -2,7 +2,6 @@
 #include <iostream>
 
 #include "board/Board.h"
-#include "movegen/move_gen.h"
 #include "perft/PERFT.h"
 
 int main()
@@ -44,6 +43,6 @@ int main()
     // print(board.piece_bitboards[K]);
     auto perft = PERFT();
     perft.board.parse_FEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-    perft.perft_driver(2);
+    perft.perft_driver(4);
     std::cout << perft.nodes << std::endl;
 }

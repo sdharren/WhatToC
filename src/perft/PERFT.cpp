@@ -4,7 +4,7 @@
 
 #include "PERFT.h"
 
-PERFT::PERFT() : nodes(0), board(Board()), move_gen(MoveGenerator())
+PERFT::PERFT() : nodes(0), board(Board())
 {
 
 }
@@ -17,7 +17,7 @@ void PERFT::perft_driver(int depth)
         return;
     }
 
-    auto moves = move_gen.generate_all_pseudolegal_moves(board);
+    auto moves = board.generate_all_pseudolegal_moves(board);
     for (int i = 0; i < moves.second; i++)
     {
         auto copy_piece_bitboards = board.piece_bitboards;

@@ -1,7 +1,7 @@
 #ifndef FIND_MAGICS_H
 #define FIND_MAGICS_H
 #include "../helpers/board_defs.h"
-
+#include "../board/Board.h"
 
 Bitboard generate_blocker_board(int index, int num_of_blockers, Bitboard attack_mask);
 Bitboard generate_rook_attack_map_with_blockers(int square, Bitboard blocker_board);

@@ -1,6 +1,5 @@
 #include "find_magics.h"
 #include "../helpers/bit_helpers.h"
-#include "move_gen.h"
 #include "../helpers/prng.h"
 #include <iostream>
 
@@ -111,7 +110,7 @@ Bitboard generate_bishop_attack_map_with_blockers(int square, Bitboard blocker_b
 Bitboard find_magic_number(int square, int piece)
 {
     // Initialise the correct attack mask
-    auto x = MoveGenerator();
+    auto x = Board();
     Bitboard attack_mask = piece == R ? x.generate_rook_attack_mask_from_square(square) :
                                         x.generate_bishop_attack_mask_from_square(square);
 

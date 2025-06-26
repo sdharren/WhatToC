@@ -5,13 +5,12 @@
 #ifndef PERFT_H
 #define PERFT_H
 #include "../board/Board.h"
-#include "../movegen/move_gen.h"
 
 
 class PERFT {
 public:
     Board board;
-    MoveGenerator move_gen;
+//    MoveGenerator move_gen;
     int nodes;
 
     PERFT();
