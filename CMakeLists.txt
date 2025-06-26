@@ -19,4 +19,6 @@ add_executable(WhatToC src/main.cpp
         src/board/ZobristRandoms.h
         src/movegen/move.h
         src/movegen/move.cpp
+        src/perft/PERFT.cpp
+        src/perft/PERFT.h
 )

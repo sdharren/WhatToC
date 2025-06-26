@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "../helpers/bit_helpers.h"
+#include "../movegen/move_gen.h"
 
 Board::Board() : piece_bitboards(12), white_occupancy(0), black_occupancy(0), occupied_squares(0), piece_list(64),
                  game_state(GameState()), zobrist_randoms(ZobristRandoms())
@@ -141,6 +142,17 @@ void Board::put_piece(int piece, int square)
     // update piece list
     piece_list[square] = piece;
 
+    // update occupancy
+    if (piece <= 5)
+    {
+        set_bit(white_occupancy, square);
+    }
+    else
+    {
+        set_bit(black_occupancy, square);
+    }
+    set_bit(occupied_squares, square);
+
     // update evaluation TODO
 }
 
@@ -154,6 +166,17 @@ void Board::remove_piece(int piece, int square)
 
     // update piece list
     piece_list[square] = 12;
+
+    // update occupancy
+    if (piece <= 5)
+    {
+        reset_bit(white_occupancy, square);
+    }
+    else
+    {
+        reset_bit(black_occupancy, square);
+    }
+    reset_bit(occupied_squares, square);
 
     // update evaluation TODO
 }
@@ -207,9 +230,15 @@ void Board::update_castling_rights(int start_square, int target_square)
 bool Board::make_move(Move move)
 {
     // copy history
-    auto current_game_state = game_state;
-    current_game_state.next_move = move;
-    history.push_back(current_game_state);
+    // auto current_game_state = game_state;
+    // current_game_state.next_move = move;
+    // history.push_back(current_game_state);
+    auto copy_piece_bitboards = piece_bitboards;
+    auto copy_white_occupancy = white_occupancy;
+    auto copy_black_occupancy = black_occupancy;
+    auto copy_occupied_squares = occupied_squares;
+    auto copy_piece_list = piece_list;
+    auto copy_game_state = game_state;
 
     // get squares
     int start_square = get_start_square(move);
@@ -372,9 +401,23 @@ bool Board::make_move(Move move)
     if (game_state.side_to_move == black) game_state.fullmove_counter++;
 
     // swap side
-    game_state.side_to_move ^= 1;
+    swap_side();
 
     // check if move is legal
+    int king = game_state.side_to_move == white ? k : K;
+    int k_square = get_LS1B(piece_bitboards[king]);
+    auto mg = MoveGenerator();
+    if (mg.is_square_attacked_by_colour(k_square, game_state.side_to_move, *this))
+    {
+        piece_bitboards = copy_piece_bitboards;
+        white_occupancy = copy_white_occupancy;
+        black_occupancy = copy_black_occupancy;
+        occupied_squares = copy_occupied_squares;
+        piece_list = copy_piece_list;
+        game_state = copy_game_state;
+
+        return false;
+    }
 
 
     return true;
