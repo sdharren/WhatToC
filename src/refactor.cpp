@@ -1,4 +1,5 @@
 #include <array>
+#include <cassert>
 #include <ios>
 #include <iostream>
 #include <map>
@@ -35,29 +36,55 @@ enum Colour
 };
 
 std::map<char, int> char_to_piece{
-            {'K', K},
-            {'Q', Q},
-            {'R', R},
-            {'B', B},
-            {'N', N},
-            {'P', P},
-            {'k', k},
-            {'q', q},
-            {'r', r},
-            {'b', b},
-            {'n', n},
-            {'p', p}
+    {'K', K},
+    {'Q', Q},
+    {'R', R},
+    {'B', B},
+    {'N', N},
+    {'P', P},
+    {'k', k},
+    {'q', q},
+    {'r', r},
+    {'b', b},
+    {'n', n},
+    {'p', p}
+};
+
+std::map<int, char> piece_to_char{
+    {K, 'K'},
+    {Q, 'Q'},
+    {R, 'R'},
+    {B, 'B'},
+    {N, 'N'},
+    {P, 'P'},
+    {k, 'k'},
+    {q, 'q'},
+    {r, 'r'},
+    {b, 'b'},
+    {n, 'n'},
+    {p, 'p'}
 };
 
 std::map<std::string, int> char_to_sq{
-            {"a1", a1}, {"b1", b1}, {"c1", c1}, {"d1", d1}, {"e1", e1}, {"f1", f1}, {"g1", g1}, {"h1", h1},
-            {"a2", a2}, {"b2", b2}, {"c2", c2}, {"d2", d2}, {"e2", e2}, {"f2", f2}, {"g2", g2}, {"h2", h2},
-            {"a3", a3}, {"b3", b3}, {"c3", c3}, {"d3", d3}, {"e3", e3}, {"f3", f3}, {"g3", g3}, {"h3", h3},
-            {"a4", a4}, {"b4", b4}, {"c4", c4}, {"d4", d4}, {"e4", e4}, {"f4", f4}, {"g4", g4}, {"h4", h4},
-            {"a5", a5}, {"b5", b5}, {"c5", c5}, {"d5", d5}, {"e5", e5}, {"f5", f5}, {"g5", g5}, {"h5", h5},
-            {"a6", a6}, {"b6", b6}, {"c6", c6}, {"d6", d6}, {"e6", e6}, {"f6", f6}, {"g6", g6}, {"h6", h6},
-            {"a7", a7}, {"b7", b7}, {"c7", c7}, {"d7", d7}, {"e7", e7}, {"f7", f7}, {"g7", g7}, {"h7", h7},
-            {"a8", a8}, {"b8", b8}, {"c8", c8}, {"d8", d8}, {"e8", e8}, {"f8", f8}, {"g8", g8}, {"h8", h8}, {"-", no_sq}
+    {"a1", a1}, {"b1", b1}, {"c1", c1}, {"d1", d1}, {"e1", e1}, {"f1", f1}, {"g1", g1}, {"h1", h1},
+    {"a2", a2}, {"b2", b2}, {"c2", c2}, {"d2", d2}, {"e2", e2}, {"f2", f2}, {"g2", g2}, {"h2", h2},
+    {"a3", a3}, {"b3", b3}, {"c3", c3}, {"d3", d3}, {"e3", e3}, {"f3", f3}, {"g3", g3}, {"h3", h3},
+    {"a4", a4}, {"b4", b4}, {"c4", c4}, {"d4", d4}, {"e4", e4}, {"f4", f4}, {"g4", g4}, {"h4", h4},
+    {"a5", a5}, {"b5", b5}, {"c5", c5}, {"d5", d5}, {"e5", e5}, {"f5", f5}, {"g5", g5}, {"h5", h5},
+    {"a6", a6}, {"b6", b6}, {"c6", c6}, {"d6", d6}, {"e6", e6}, {"f6", f6}, {"g6", g6}, {"h6", h6},
+    {"a7", a7}, {"b7", b7}, {"c7", c7}, {"d7", d7}, {"e7", e7}, {"f7", f7}, {"g7", g7}, {"h7", h7},
+    {"a8", a8}, {"b8", b8}, {"c8", c8}, {"d8", d8}, {"e8", e8}, {"f8", f8}, {"g8", g8}, {"h8", h8}, {"-", no_sq}
+};
+
+std::map<int, std::string> sq_to_char{
+    {a1, "a1"}, {b1, "b1"}, {c1, "c1"}, {d1, "d1"}, {e1, "e1"}, {f1, "f1"}, {g1, "g1"}, {h1, "h1"},
+    {a2, "a2"}, {b2, "b2"}, {c2, "c2"}, {d2, "d2"}, {e2, "e2"}, {f2, "f2"}, {g2, "g2"}, {h2, "h2"},
+    {a3, "a3"}, {b3, "b3"}, {c3, "c3"}, {d3, "d3"}, {e3, "e3"}, {f3, "f3"}, {g3, "g3"}, {h3, "h3"},
+    {a4, "a4"}, {b4, "b4"}, {c4, "c4"}, {d4, "d4"}, {e4, "e4"}, {f4, "f4"}, {g4, "g4"}, {h4, "h4"},
+    {a5, "a5"}, {b5, "b5"}, {c5, "c5"}, {d5, "d5"}, {e5, "e5"}, {f5, "f5"}, {g5, "g5"}, {h5, "h5"},
+    {a6, "a6"}, {b6, "b6"}, {c6, "c6"}, {d6, "d6"}, {e6, "e6"}, {f6, "f6"}, {g6, "g6"}, {h6, "h6"},
+    {a7, "a7"}, {b7, "b7"}, {c7, "c7"}, {d7, "d7"}, {e7, "e7"}, {f7, "f7"}, {g7, "g7"}, {h7, "h7"},
+    {a8, "a8"}, {b8, "b8"}, {c8, "c8"}, {d8, "d8"}, {e8, "e8"}, {f8, "f8"}, {g8, "g8"}, {h8, "h8"},
 };
 
 std::array<Bitboard, 64> ROOK_MAGICS = {
@@ -319,6 +346,14 @@ int is_queen_capture_promo_move(Move move)
     return shift_to_flags(move) == 15;
 }
 
+void print_move(Move move)
+{
+    auto ss = get_start_square(move);
+    auto ts = get_target_square(move);
+    auto x = shift_to_flags(move);
+    std::cout << sq_to_char[ss] << "" << sq_to_char[ts] << "-" << x << ": ";
+}
+
 // random number generation
 
 unsigned int RANDOM_STATE = 1804289383;
@@ -434,6 +469,28 @@ public:
     std::vector<std::vector<Bitboard> > ROOK_ATTACK_TABLE;
     std::vector<std::vector<Bitboard> > BISHOP_ATTACK_TABLE;
 
+    void print_piece_list()
+    {
+        for (int rank = 8; rank > 0; rank--)
+        {
+            for (int file = 0; file < 8; file++)
+            {
+                int square = (rank - 1) * 8 + file;
+                int temp = piece_list[square];
+                char x;
+                if (temp == 12)
+                {
+                    x = '.';
+                }
+                else
+                {
+                    x = piece_to_char[temp];
+                }
+                std::cout << x << ' ';;
+            }
+            std::cout << std::endl;
+        }
+    }
     Bitboard generate_king_attack_from_square(int square)
     {
         Bitboard attack_map = 0;
@@ -771,7 +828,7 @@ public:
         set_bit(piece_bitboards[piece], square);
 
         // update zobrist key
-        game_state.zobrist_key = zobrist_randoms.piece_randoms[piece][square];
+        game_state.zobrist_key ^= zobrist_randoms.piece_randoms[piece][square];
 
         // update piece list
         piece_list[square] = piece;
@@ -796,7 +853,7 @@ public:
         reset_bit(piece_bitboards[piece], square);
 
         // update zobrist key
-        game_state.zobrist_key = zobrist_randoms.piece_randoms[piece][square];
+        game_state.zobrist_key ^= zobrist_randoms.piece_randoms[piece][square];
 
         // update piece list
         piece_list[square] = 12;
@@ -959,7 +1016,7 @@ public:
         game_state.halfmove_clock++;
 
         // reset ep square
-        game_state.ep_square = no_sq;
+        set_ep_square(64);
 
         if (is_quiet)
         {
@@ -1008,17 +1065,21 @@ public:
 
         if (is_capture)
         {
+            // std::cout << "we are in correct branch" << std::endl;
+            // std::cout << piece << std::endl;
             int target_piece = piece_list[target_square];
-            move_piece(piece, start_square, target_square);
+            // std::cout << target_piece << std::endl;
             remove_piece(target_piece, target_square);
+            move_piece(piece, start_square, target_square);
             game_state.halfmove_clock = 0;
         }
 
         if (is_ep)
         {
             move_piece(piece, start_square, target_square);
+            int offset = game_state.side_to_move == white ? -8 : 8;
             int target_piece = game_state.side_to_move == white ? p : P;
-            remove_piece(target_piece, target_square);
+            remove_piece(target_piece, target_square + offset);
             game_state.halfmove_clock = 0;
         }
 
@@ -1087,8 +1148,7 @@ public:
         }
 
         // update castling rights
-        game_state.castling_rights &= CASTLING_RIGHTS[start_square];
-        game_state.castling_rights &= CASTLING_RIGHTS[target_square];
+        update_castling_rights(start_square, target_square);
 
         // increment fullmove counter
         if (game_state.side_to_move == black) game_state.fullmove_counter++;
@@ -1111,6 +1171,10 @@ public:
             return false;
         }
 
+        // std::cout << "after the move:" << std::endl;
+        // print_move(move);
+        // std::cout << std::endl;
+        // print_piece_list();
 
         return true;
     }
@@ -1376,12 +1440,60 @@ public:
             board.game_state = copy_game_state;
         }
     }
+
+    void perft_test_driver(int depth)
+    {
+        if (depth == 0)
+        {
+            nodes++;
+            return;
+        }
+
+        auto moves = board.generate_all_pseudolegal_moves();
+        for (int i = 0; i < moves.second; i++)
+        {
+            auto copy_piece_bitboards = board.piece_bitboards;
+            auto copy_white_occupancy = board.white_occupancy;
+            auto copy_black_occupancy = board.black_occupancy;
+            auto copy_occupied_squares = board.occupied_squares;
+            auto copy_piece_list = board.piece_list;
+            auto copy_game_state = board.game_state;
+
+            if (!board.make_move(moves.first[i])) continue;
+
+            int curr_nodes = nodes;
+            perft_driver(depth - 1);
+            int diff = nodes - curr_nodes;
+
+            board.piece_bitboards = copy_piece_bitboards;
+            board.white_occupancy = copy_white_occupancy;
+            board.black_occupancy = copy_black_occupancy;
+            board.occupied_squares = copy_occupied_squares;
+            board.piece_list = copy_piece_list;
+            board.game_state = copy_game_state;
+
+            print_move(moves.first[i]);
+            std::cout << diff << std::endl;
+        }
+    }
 };
 
 int main()
 {
+
     auto perft = PERFT();
-    perft.board.parse_FEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-    perft.perft_driver(2);
+    perft.board.parse_FEN("r4rk1/1pp1qppp/p1np1n2/2b1p1B1/2B1P1b1/P1NP1N2/1PP1QPPP/R4RK1 w - - 0 10");
+    perft.perft_driver(5);
+    assert(perft.nodes == 164075551);
     std::cout << perft.nodes << std::endl;
+    // auto board = Board();
+    // board.parse_FEN("8/2p5/3p4/KP5r/5p1k/8/4P1P1/1R6 b - - 0 1");
+    // auto move = create_move(h5, b5, 0b100);
+    // board.make_move(move);
+    // board.print_piece_list();
+    // std::cout << "----------------------" << std::endl;
+
+    // board.make_move(create_move(h5, b5, 4));
+    // board.print_piece_list();
+
 }
