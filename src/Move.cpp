@@ -1,5 +1,8 @@
-#include "move.h"
+#include "board_defs.h"
+#include "Move.h"
+#include <iostream>
 
+// Create a move
 Move create_move(int start_square, int target_square, int move_flags)
 {
     Move move =  0;
@@ -95,42 +98,11 @@ int is_queen_capture_promo_move(Move move)
     return shift_to_flags(move) == 15;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// Pretty print a move, for debugging purposes
+void print_move(Move move)
+{
+    auto ss = get_start_square(move);
+    auto ts = get_target_square(move);
+    auto x = shift_to_flags(move);
+    std::cout << sq_to_char.at(ss) << "" << sq_to_char.at(ts) << "-" << x << ": ";
+}

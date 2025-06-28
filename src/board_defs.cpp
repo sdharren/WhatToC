@@ -1,4 +1,6 @@
-#include "bit_helpers.h"
+#include "board_defs.h"
+
+#include <iostream>
 
 // return if a bit is set
 Bitboard get_bit(Bitboard bitboard, int square)
@@ -35,4 +37,22 @@ int count_bits(Bitboard bitboard)
 int get_LS1B(Bitboard bitboard)
 {
     return count_bits((bitboard & -bitboard) - 1);
+}
+
+// Pretty print a bitboard
+void print(Bitboard bitboard)
+{
+    std::cout << "     Bitboard: " << bitboard << std::endl;
+    for (int rank = 8; rank > 0; rank--)
+    {
+        std::cout << rank << "   ";
+        for (int file = 0; file < 8; file++)
+        {
+            int square = (rank - 1) * 8 + file;
+            char c = get_bit(bitboard, square) ? 'X' : '.';
+            std::cout << c << " ";
+        }
+        std::cout << std::endl;
+    }
+    std::cout << "    a b c d e f g h" << std::endl;
 }

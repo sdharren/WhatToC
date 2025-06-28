@@ -1,6 +1,5 @@
+#include "PRNG.h"
 #include "ZobristRandoms.h"
-
-#include "../helpers/prng.h"
 
 ZobristRandoms::ZobristRandoms() : piece_randoms(12, std::vector<Bitboard>(64)), ep_square_randoms(65),
                                    castling_rights_randoms(16), side_to_move_randoms(2)
@@ -11,6 +10,7 @@ ZobristRandoms::ZobristRandoms() : piece_randoms(12, std::vector<Bitboard>(64)),
     init_side_to_move_randoms();
 }
 
+// Generate random numbers for pieces, on each square
 void ZobristRandoms::init_piece_randoms()
 {
     for (int piece = K; piece <= p; piece++)
@@ -22,6 +22,7 @@ void ZobristRandoms::init_piece_randoms()
     }
 }
 
+// Generate a random number for en-passant squares
 void ZobristRandoms::init_ep_square_randoms()
 {
     for (int square = 0; square < 65; square++)
@@ -30,6 +31,7 @@ void ZobristRandoms::init_ep_square_randoms()
     }
 }
 
+// Generate a random number for each castling right combination
 void ZobristRandoms::init_castling_rights_randoms()
 {
     for (int right = 0; right < 16; right++)
@@ -38,6 +40,7 @@ void ZobristRandoms::init_castling_rights_randoms()
     }
 }
 
+// Generate 2 keys for each side to play
 void ZobristRandoms::init_side_to_move_randoms()
 {
     for (int side = white; side <= black; side++)
@@ -45,3 +48,4 @@ void ZobristRandoms::init_side_to_move_randoms()
         side_to_move_randoms[side] = get_random_64();
     }
 }
+

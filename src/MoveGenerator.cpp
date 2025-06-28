@@ -1,14 +1,4 @@
-#include "move_gen.h"
-
-#include <iostream>
-
-#include "find_magics.h"
-#include "../helpers/bit_helpers.h"
-
-Bitboard A_FILE_MASK = 0x0101010101010101;
-Bitboard H_FILE_MASK = 0x8080808080808080;
-Bitboard AB_FILE_MASK = 0x303030303030303;
-Bitboard GH_FILE_MASK = 0xc0c0c0c0c0c0c0c0;
+#include "MoveGenerator.h"
 
 MoveGenerator::MoveGenerator() : PAWN_ATTACK_TABLE(2, std::vector<Bitboard>(64)), KNIGHT_ATTACK_TABLE(64),
                                  KING_ATTACK_TABLE(64), ROOK_ATTACK_TABLE(64, std::vector<Bitboard>(4096)),
@@ -17,6 +7,26 @@ MoveGenerator::MoveGenerator() : PAWN_ATTACK_TABLE(2, std::vector<Bitboard>(64))
     initialise_leaper_piece_attack_tables();
     initialise_rook_attack_table();
     initialise_bishop_attack_table();
+}
+
+/* -------------------------------------------------------------------------------------------------------------------
+ * Populating attack tables, and generating attacks from each piece from a square
+ */
+
+void MoveGenerator::initialise_leaper_piece_attack_tables()
+{
+    for (int square = 0; square < 64; square++)
+    {
+        // generate king attack
+        KING_ATTACK_TABLE[square] = generate_king_attack_from_square(square);
+
+        // generate knight attack
+        KNIGHT_ATTACK_TABLE[square] = generate_knight_attack_from_square(square);
+
+        // generate pawn attacks
+        PAWN_ATTACK_TABLE[white][square] = generate_pawn_attack_from_square(square, white);
+        PAWN_ATTACK_TABLE[black][square] = generate_pawn_attack_from_square(square, black);
+    }
 }
 
 Bitboard MoveGenerator::generate_king_attack_from_square(int square)
@@ -91,99 +101,6 @@ Bitboard MoveGenerator::generate_pawn_attack_from_square(int square, int colour)
     return attack_map;
 }
 
-void MoveGenerator::initialise_leaper_piece_attack_tables()
-{
-    for (int square = 0; square < 64; square++)
-    {
-        // generate king attack
-        KING_ATTACK_TABLE[square] = generate_king_attack_from_square(square);
-
-        // generate knight attack
-        KNIGHT_ATTACK_TABLE[square] = generate_knight_attack_from_square(square);
-
-        // generate pawn attacks
-        PAWN_ATTACK_TABLE[white][square] = generate_pawn_attack_from_square(square, white);
-        PAWN_ATTACK_TABLE[black][square] = generate_pawn_attack_from_square(square, black);
-    }
-
-}
-
-Bitboard MoveGenerator::generate_rook_attack_mask_from_square(int square)
-{
-    Bitboard attack_mask = 0;
-    int rank =  square / 8;
-    int file = square % 8;
-    int newSquare;
-
-    // east
-    for (int newFile = file + 1; newFile < 7; newFile++)
-    {
-        newSquare = rank * 8 + newFile;
-        set_bit(attack_mask, newSquare);
-    }
-
-    // west
-    for (int newFile = file - 1; newFile > 0; newFile--)
-    {
-        newSquare = rank * 8 + newFile;
-        set_bit(attack_mask, newSquare);
-    }
-
-    // north
-    for (int newRank = rank + 1; newRank < 7; newRank++)
-    {
-        newSquare = newRank * 8 + file;
-        set_bit(attack_mask, newSquare);
-    }
-
-    // south
-    for (int newRank = rank - 1; newRank > 0; newRank--)
-    {
-        newSquare = newRank * 8 + file;
-        set_bit(attack_mask, newSquare);
-    }
-
-    return attack_mask;
-}
-
-Bitboard MoveGenerator::generate_bishop_attack_mask_from_square(int square)
-{
-    Bitboard attack_mask = 0;
-    int rank =  square / 8;
-    int file = square % 8;
-    int newSquare;
-
-    // NE
-    for (int newFile = file + 1, newRank = rank + 1; newFile < 7 && newRank < 7; newFile++, newRank++)
-    {
-        newSquare = newRank * 8 + newFile;
-        set_bit(attack_mask, newSquare);
-    }
-
-    // SE
-    for (int newFile = file + 1, newRank = rank - 1; newFile < 7 && newRank > 0; newFile++, newRank--)
-    {
-        newSquare = newRank * 8 + newFile;
-        set_bit(attack_mask, newSquare);
-    }
-
-    // SW
-    for (int newFile = file - 1, newRank = rank - 1; newFile > 0 && newRank > 0; newFile--, newRank--)
-    {
-        newSquare = newRank * 8 + newFile;
-        set_bit(attack_mask, newSquare);
-    }
-
-    // NW
-    for (int newFile = file - 1, newRank = rank + 1; newFile > 0 && newRank < 7; newFile--, newRank++)
-    {
-        newSquare = newRank * 8 + newFile;
-        set_bit(attack_mask, newSquare);
-    }
-
-    return attack_mask;
-}
-
 void MoveGenerator::initialise_rook_attack_table()
 {
     for (int square = 0; square < 64; square++)
@@ -200,6 +117,48 @@ void MoveGenerator::initialise_rook_attack_table()
             ROOK_ATTACK_TABLE[square][magic_index] = generate_rook_attack_map_with_blockers(square, blocker_board);
         }
     }
+}
+
+Bitboard MoveGenerator::generate_rook_attack_map_with_blockers(int square, Bitboard blocker_board)
+{
+    Bitboard attack_map = 0;
+    int rank =  square / 8;
+    int file = square % 8;
+    int newSquare;
+
+    // east
+    for (int newFile = file + 1; newFile < 8; newFile++)
+    {
+        newSquare = rank * 8 + newFile;
+        set_bit(attack_map, newSquare);
+        if (blocker_board & (1ULL << newSquare)) break;
+    }
+
+    // west
+    for (int newFile = file - 1; newFile >= 0; newFile--)
+    {
+        newSquare = rank * 8 + newFile;
+        set_bit(attack_map, newSquare);
+        if (blocker_board & (1ULL << newSquare)) break;
+    }
+
+    // north
+    for (int newRank = rank + 1; newRank < 8; newRank++)
+    {
+        newSquare = newRank * 8 + file;
+        set_bit(attack_map, newSquare);
+        if (blocker_board & (1ULL << newSquare)) break;
+    }
+
+    // south
+    for (int newRank = rank - 1; newRank >= 0; newRank--)
+    {
+        newSquare = newRank * 8 + file;
+        set_bit(attack_map, newSquare);
+        if (blocker_board & (1ULL << newSquare)) break;
+    }
+
+    return attack_map;
 }
 
 void MoveGenerator::initialise_bishop_attack_table()
@@ -220,6 +179,63 @@ void MoveGenerator::initialise_bishop_attack_table()
     }
 }
 
+Bitboard MoveGenerator::generate_bishop_attack_map_with_blockers(int square, Bitboard blocker_board)
+{
+    Bitboard attack_map = 0;
+    int rank =  square / 8;
+    int file = square % 8;
+    int newSquare;
+
+    // NE
+    for (int newFile = file + 1, newRank = rank + 1; newFile < 8 && newRank < 8; newFile++, newRank++)
+    {
+        newSquare = newRank * 8 + newFile;
+        set_bit(attack_map, newSquare);
+        if (blocker_board & (1ULL << newSquare)) break;
+    }
+
+    // SE
+    for (int newFile = file + 1, newRank = rank - 1; newFile < 8 && newRank >= 0; newFile++, newRank--)
+    {
+        newSquare = newRank * 8 + newFile;
+        set_bit(attack_map, newSquare);
+        if (blocker_board & (1ULL << newSquare)) break;
+    }
+
+    // SW
+    for (int newFile = file - 1, newRank = rank - 1; newFile >= 0 && newRank >= 0; newFile--, newRank--)
+    {
+        newSquare = newRank * 8 + newFile;
+        set_bit(attack_map, newSquare);
+        if (blocker_board & (1ULL << newSquare)) break;
+    }
+
+    // NW
+    for (int newFile = file - 1, newRank = rank + 1; newFile >= 0 && newRank < 8; newFile--, newRank++)
+    {
+        newSquare = newRank * 8 + newFile;
+        set_bit(attack_map, newSquare);
+        if (blocker_board & (1ULL << newSquare)) break;
+    }
+
+    return attack_map;
+}
+
+Bitboard MoveGenerator::generate_blocker_board(int index, int num_of_blockers, Bitboard attack_mask)
+{
+    Bitboard blocker_board = 0;
+    for (int bit = 0; bit < num_of_blockers; bit++)
+    {
+        int square = get_LS1B(attack_mask);
+        attack_mask &= attack_mask - 1;
+
+        if (index & (1 << bit)) blocker_board |= 1ULL << square;
+    }
+
+    return blocker_board;
+}
+
+// Rook, Bishop, and Queen need their own functions to retrieve attacks
 Bitboard MoveGenerator::generate_rook_attack_from_square(int square, Bitboard occupancy)
 {
     auto mask = ROOK_ATTACK_MASKS[square];
@@ -249,8 +265,42 @@ Bitboard MoveGenerator::generate_queen_attack_from_square(int square, Bitboard o
     return queen_attack | BISHOP_ATTACK_TABLE[square][magic_index];
 }
 
-void MoveGenerator::generate_piece_pseudolegal_moves(std::vector<Move> &move_list, int &move_count, Board &board,
-                                                      int piece)
+/* --------------------------------------------------------------------------------------------------------------------
+ * These functions concern generating all pseudolegal moves for the board for a given ruleset
+ */
+
+std::pair<std::vector<Move>, int> MoveGenerator::generate_all_pseudolegal_moves(Board &board)
+{
+    // initialise return variables
+    std::vector<Move> move_list(256);
+    int move_count = 0;
+
+    // generate rook moves
+    generate_piece_pseudolegal_moves(move_list, move_count, R, board);
+
+    // generate bishop moves
+    generate_piece_pseudolegal_moves(move_list, move_count, B, board);
+
+    // generate queen moves
+    generate_piece_pseudolegal_moves(move_list, move_count, Q, board);
+
+    // generate knight moves
+    generate_piece_pseudolegal_moves(move_list, move_count, N, board);
+
+    // generate king moves
+    generate_piece_pseudolegal_moves(move_list, move_count, K, board);
+
+    // castling
+    generate_castling_pseudolegal_moves(move_list, move_count, board);
+
+    // generate pawn moves
+    generate_pawn_pseudolegal_moves(move_list, move_count, board);
+
+    return std::make_pair(move_list, move_count);
+}
+
+void MoveGenerator::generate_piece_pseudolegal_moves(std::vector<Move> &move_list, int &move_count, int piece,
+                                                     Board &board)
 {
     int side = board.game_state.side_to_move == white ? 0 : 6;
     Bitboard& player_bitboard = board.game_state.side_to_move == white ? board.white_occupancy : board.black_occupancy;
@@ -304,38 +354,6 @@ void MoveGenerator::generate_piece_pseudolegal_moves(std::vector<Move> &move_lis
         // pop current bit
         bitboard &= bitboard - 1;
     }
-
-}
-
-bool MoveGenerator::is_square_attacked_by_colour(int square, int colour, Board &board)
-{
-    Bitboard attack_squares;
-    int side = colour == white ? 0 : 6;
-    // attacked by rook
-    attack_squares = generate_rook_attack_from_square(square, board.occupied_squares);
-    if (attack_squares & board.piece_bitboards[R + side]) return true;
-
-    // attacked by bishop
-    attack_squares = generate_bishop_attack_from_square(square, board.occupied_squares);
-    if (attack_squares & board.piece_bitboards[B + side]) return true;
-
-    // attacked by queen
-    attack_squares = generate_queen_attack_from_square(square, board.occupied_squares);
-    if (attack_squares & board.piece_bitboards[Q + side]) return true;
-
-    // attacked by knight
-    attack_squares = KNIGHT_ATTACK_TABLE[square];
-    if (attack_squares & board.piece_bitboards[N + side]) return true;
-
-    // attacked by pawn
-    attack_squares = PAWN_ATTACK_TABLE[colour ^ 1][square];
-    if (attack_squares & board.piece_bitboards[P + side]) return true;
-
-    // attacked by king
-    attack_squares = KING_ATTACK_TABLE[square];
-    if (attack_squares & board.piece_bitboards[K + side]) return true;
-
-    return false;
 }
 
 void MoveGenerator::generate_castling_pseudolegal_moves(std::vector<Move> &move_list, int &move_count, Board &board)
@@ -378,7 +396,7 @@ void MoveGenerator::generate_castling_pseudolegal_moves(std::vector<Move> &move_
     }
 }
 
-void MoveGenerator::generate_pawn_pseudolegal_moves(std::vector<Move>& move_list, int& move_count, Board& board)
+void MoveGenerator::generate_pawn_pseudolegal_moves(std::vector<Move>& move_list, int& move_count, Board &board)
 {
     int side = board.game_state.side_to_move == white ? 0 : 6;
     int offset = board.game_state.side_to_move == white ? 1 : -1;
@@ -471,32 +489,33 @@ void MoveGenerator::generate_pawn_pseudolegal_moves(std::vector<Move>& move_list
     }
 }
 
-std::pair<std::vector<Move>, int> MoveGenerator::generate_all_pseudolegal_moves(Board &board)
+bool MoveGenerator::is_square_attacked_by_colour(int square, int colour, Board &board)
 {
-    // initialise return variables
-    std::vector<Move> move_list(256);
-    int move_count = 0;
+    Bitboard attack_squares;
+    int side = colour == white ? 0 : 6;
+    // attacked by rook
+    attack_squares = generate_rook_attack_from_square(square, board.occupied_squares);
+    if (attack_squares & board.piece_bitboards[R + side]) return true;
 
-    // generate rook moves
-    generate_piece_pseudolegal_moves(move_list, move_count, board, R);
+    // attacked by bishop
+    attack_squares = generate_bishop_attack_from_square(square, board.occupied_squares);
+    if (attack_squares & board.piece_bitboards[B + side]) return true;
 
-    // generate bishop moves
-    generate_piece_pseudolegal_moves(move_list, move_count, board, B);
+    // attacked by queen
+    attack_squares = generate_queen_attack_from_square(square, board.occupied_squares);
+    if (attack_squares & board.piece_bitboards[Q + side]) return true;
 
-    // generate queen moves
-    generate_piece_pseudolegal_moves(move_list, move_count, board, Q);
+    // attacked by knight
+    attack_squares = KNIGHT_ATTACK_TABLE[square];
+    if (attack_squares & board.piece_bitboards[N + side]) return true;
 
-    // generate knight moves
-    generate_piece_pseudolegal_moves(move_list, move_count, board, N);
+    // attacked by pawn
+    attack_squares = PAWN_ATTACK_TABLE[colour ^ 1][square];
+    if (attack_squares & board.piece_bitboards[P + side]) return true;
 
-    // generate king moves
-    generate_piece_pseudolegal_moves(move_list, move_count, board, K);
+    // attacked by king
+    attack_squares = KING_ATTACK_TABLE[square];
+    if (attack_squares & board.piece_bitboards[K + side]) return true;
 
-    // castling
-    generate_castling_pseudolegal_moves(move_list, move_count, board);
-
-    // generate pawn moves
-    generate_pawn_pseudolegal_moves(move_list, move_count, board);
-
-    return std::make_pair(move_list, move_count);
+    return false;
 }

@@ -1,14 +1,15 @@
-#ifndef MOVE_GEN_H
-#define MOVE_GEN_H
+#ifndef MOVEGENERATOR_H
+#define MOVEGENERATOR_H
+
+#include "Board.h"
+#include "board_defs.h"
+#include "Move.h"
 
 #include <array>
 #include <vector>
 
-#include "move.h"
-#include "../helpers/board_defs.h"
-#include "../board/Board.h"
-
-inline std::array<Bitboard, 64> ROOK_MAGICS = {
+// MoveGenerator constants
+inline constexpr std::array<Bitboard, 64> ROOK_MAGICS = {
     0x8a80104000800020ULL, 0x140002000100040ULL, 0x2801880a0017001ULL, 0x100081001000420ULL, 0x200020010080420ULL,
     0x3001c0002010008ULL, 0x8480008002000100ULL, 0x2080088004402900ULL, 0x800098204000ULL, 0x2024401000200040ULL,
     0x100802000801000ULL, 0x120800800801000ULL, 0x208808088000400ULL, 0x2802200800400ULL, 0x2200800100020080ULL,
@@ -24,7 +25,7 @@ inline std::array<Bitboard, 64> ROOK_MAGICS = {
     0x20030a0244872ULL, 0x12001008414402ULL, 0x2006104900a0804ULL, 0x1004081002402ULL,
 };
 
-inline std::array<Bitboard, 64> ROOK_ATTACK_MASKS = {
+inline constexpr std::array<Bitboard, 64> ROOK_ATTACK_MASKS = {
     282578800148862ULL, 565157600297596ULL, 1130315200595066ULL, 2260630401190006ULL, 4521260802379886ULL,
     9042521604759646ULL, 18085043209519166ULL, 36170086419038334ULL, 282578800180736ULL, 565157600328704ULL,
     1130315200625152ULL, 2260630401218048ULL, 4521260802403840ULL, 9042521604775424ULL, 18085043209518592ULL,
@@ -41,7 +42,7 @@ inline std::array<Bitboard, 64> ROOK_ATTACK_MASKS = {
     9115426935197958144ULL,
 };
 
-inline std::array<int, 64> ROOK_SHIFT_BITS = {
+inline constexpr std::array<int, 64> ROOK_SHIFT_BITS = {
     12, 11, 11, 11, 11, 11, 11, 12,
     11, 10, 10, 10, 10, 10, 10, 11,
     11, 10, 10, 10, 10, 10, 10, 11,
@@ -52,7 +53,7 @@ inline std::array<int, 64> ROOK_SHIFT_BITS = {
     12, 11, 11, 11, 11, 11, 11, 12,
 };
 
-inline std::array<Bitboard, 64> BISHOP_MAGICS = {
+inline constexpr std::array<Bitboard, 64> BISHOP_MAGICS = {
     0x40040844404084ULL, 0x2004208a004208ULL, 0x10190041080202ULL, 0x108060845042010ULL, 0x581104180800210ULL,
     0x2112080446200010ULL, 0x1080820820060210ULL, 0x3c0808410220200ULL, 0x4050404440404ULL, 0x21001420088ULL,
     0x24d0080801082102ULL, 0x1020a0a020400ULL, 0x40308200402ULL, 0x4011002100800ULL, 0x401484104104005ULL,
@@ -68,7 +69,7 @@ inline std::array<Bitboard, 64> BISHOP_MAGICS = {
     0x28000010020204ULL, 0x6000020202d0240ULL, 0x8918844842082200ULL, 0x4010011029020020ULL,
 };
 
-inline std::array<Bitboard, 64> BISHOP_ATTACK_MASKS = {
+inline constexpr std::array<Bitboard, 64> BISHOP_ATTACK_MASKS = {
     18049651735527936ULL, 70506452091904ULL, 275415828992ULL, 1075975168ULL, 38021120ULL, 8657588224ULL,
     2216338399232ULL, 567382630219776ULL, 9024825867763712ULL, 18049651735527424ULL, 70506452221952ULL,
     275449643008ULL, 9733406720ULL, 2216342585344ULL, 567382630203392ULL, 1134765260406784ULL, 4512412933816832ULL,
@@ -84,7 +85,7 @@ inline std::array<Bitboard, 64> BISHOP_ATTACK_MASKS = {
     18049651735527936ULL,
 };
 
-inline std::array<int, 64> BISHOP_SHIFT_BITS = {
+inline constexpr std::array<int, 64> BISHOP_SHIFT_BITS = {
     6, 5, 5, 5, 5, 5, 5, 6,
     5, 5, 5, 5, 5, 5, 5, 5,
     5, 5, 7, 7, 7, 7, 5, 5,
@@ -95,41 +96,41 @@ inline std::array<int, 64> BISHOP_SHIFT_BITS = {
     6, 5, 5, 5, 5, 5, 5, 6,
 };
 
-inline Bitboard RANK_8_MASK = 0xff00000000000000;
-inline Bitboard RANK_1_MASK = 0xff;
-inline Bitboard RANK_2_MASK = 0xff00;
-inline Bitboard RANK_7_MASK = 0xff000000000000;
-
-class MoveGenerator
-{
+// MoveGenerator class
+class MoveGenerator {
 public:
     std::vector<std::vector<Bitboard> > PAWN_ATTACK_TABLE;
     std::vector<Bitboard> KNIGHT_ATTACK_TABLE;
     std::vector<Bitboard> KING_ATTACK_TABLE;
     std::vector<std::vector<Bitboard> > ROOK_ATTACK_TABLE;
     std::vector<std::vector<Bitboard> > BISHOP_ATTACK_TABLE;
-
     MoveGenerator();
+
+    // populate attack tables
     void initialise_leaper_piece_attack_tables();
-    Bitboard generate_pawn_attack_from_square(int square, int colour);
-    Bitboard generate_knight_attack_from_square(int square);
     Bitboard generate_king_attack_from_square(int square);
-    Bitboard generate_rook_attack_mask_from_square(int square);
-    Bitboard generate_bishop_attack_mask_from_square(int square);
+    Bitboard generate_knight_attack_from_square(int square);
+    Bitboard generate_pawn_attack_from_square(int square, int colour);
 
     void initialise_rook_attack_table();
-    void initialise_bishop_attack_table();
+    Bitboard generate_rook_attack_map_with_blockers(int square, Bitboard blocker_board);
 
+    void initialise_bishop_attack_table();
+    Bitboard generate_bishop_attack_map_with_blockers(int square, Bitboard blocker_board);
+
+    Bitboard generate_blocker_board(int index, int num_of_blockers, Bitboard attack_mask);
+
+    // generate piece attacks from square; leapers read from the table, sliders require a function call
     Bitboard generate_rook_attack_from_square(int square, Bitboard occupancy);
     Bitboard generate_bishop_attack_from_square(int square, Bitboard occupancy);
     Bitboard generate_queen_attack_from_square(int square, Bitboard occupancy);
 
-    std::pair<std::vector<Move>, int>generate_all_pseudolegal_moves(Board &board);
-    void generate_piece_pseudolegal_moves(std::vector<Move> &move_list, int &move_count, Board &board, int piece);
+    // generating moves
+    std::pair<std::vector<Move>, int> generate_all_pseudolegal_moves(Board &board);
+    void generate_piece_pseudolegal_moves(std::vector<Move> &move_list, int &move_count, int piece, Board &board);
     void generate_castling_pseudolegal_moves(std::vector<Move> &move_list, int &move_count, Board &board);
+    void generate_pawn_pseudolegal_moves(std::vector<Move>& move_list, int& move_count, Board &board);
     bool is_square_attacked_by_colour(int square, int colour, Board &board);
-    void generate_pawn_pseudolegal_moves(std::vector<Move> &move_list, int &move_count, Board &board);
-
 };
 
-#endif //MOVE_GEN_H
+#endif //MOVEGENERATOR_H
