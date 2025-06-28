@@ -1,7 +1,6 @@
-#include "prng.h"
+#include "PRNG.h"
 
-unsigned int RANDOM_STATE = 1804289383;
-
+// Generate random 32-bit number
 unsigned int get_random_32()
 {
     auto number = RANDOM_STATE;
@@ -17,6 +16,7 @@ unsigned int get_random_32()
     return number;
 }
 
+// Generate random 64-bit number
 unsigned long long get_random_64()
 {
     // generate 4 random 32-bit numbers, and get the first 16 bits

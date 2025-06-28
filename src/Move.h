@@ -2,13 +2,13 @@
 #define MOVE_H
 #include <cstdint>
 
+// Standardised Move type
 using Move = uint16_t;
 
+// Move functions
 Move create_move(int start_square, int target_square, int move_flags);
-
 int get_start_square(Move move);
 int get_target_square(Move move);
-
 Move shift_to_flags(Move move);
 int is_quiet_move(Move move);
 int is_double_pawn_push_move(Move move);
@@ -24,5 +24,6 @@ int is_knight_capture_promo_move(Move move);
 int is_bishop_capture_promo_move(Move move);
 int is_rook_capture_promo_move(Move move);
 int is_queen_capture_promo_move(Move move);
+void print_move(Move move);
 
 #endif //MOVE_H
