@@ -35,6 +35,14 @@ WhatToDo, but with better planning, additional features, and in C++ because Pyth
 - finish move gen
 - add perft testing <--------- FIRST MILESTONE (doesn't need evaluation, or board state really tbh but whatever)
 
+# PERFT speed refactor
+- get rid of copying bitboards
+- only copy the game state
+- implement unmake move from board, so we don't have to construct/destruct new vectors
+- change move_list to reserve, instead of default
+- change all the other vectors to reserve too
+- CONSIDER BRANCHING HERE AND CHANGING EVERYTHING FROM VECTOR TO ARRAY
+
 # Minimax, Negamax, Alpha-Beta pruning
 - board game score IS NOT measured relative, i.e. + is good for white, - is good for black. If it was relative, + is
 good for whatever side, and - is bad for whatever side
