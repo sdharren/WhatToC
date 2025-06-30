@@ -56,7 +56,6 @@ public:
 
     // debugging functions
     void print_piece_list();
-
     bool operator==(const Board& b2);
 };
 

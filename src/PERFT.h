@@ -6,7 +6,6 @@ class PERFT {
 public:
     Engine engine;
     int nodes;
-    std::vector<Move> ml;
 
     PERFT();
     PERFT(std::string FEN_string, int depth);

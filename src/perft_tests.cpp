@@ -41,7 +41,6 @@ void perft_tests()
     assert(perft.nodes == 97862);
     perft.nodes = 0;
     perft.perft_driver(4);
-    std::cout << perft.nodes << std::endl;
     assert(perft.nodes == 4085603);
     perft.nodes = 0;
 
@@ -52,11 +51,9 @@ void perft_tests()
     assert(perft.nodes == 44);
     perft.nodes = 0;
     perft.perft_driver(2);
-    std::cout << perft.nodes << std::endl;
     assert(perft.nodes == 1486);
     perft.nodes = 0;
     perft.perft_driver(3);
-    std::cout << perft.nodes << std::endl;
     assert(perft.nodes == 62379);
     perft.nodes = 0;
     perft.perft_driver(4);

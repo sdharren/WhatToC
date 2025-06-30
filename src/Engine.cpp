@@ -94,10 +94,7 @@ bool Engine::make_move(Move move)
 
     if (is_capture)
     {
-        // std::cout << "we are in correct branch" << std::endl;
-        // std::cout << piece << std::endl;
         target_piece = board.piece_list[target_square];
-        // std::cout << target_piece << std::endl;
         board.remove_piece(target_piece, target_square, false);
         board.move_piece(piece, start_square, target_square, false);
         board.game_state.halfmove_clock = 0;
@@ -222,7 +219,6 @@ void Engine::unmake_move(Move move, GameState game_state, int target_piece)
     int is_knight_capture_promo = is_knight_capture_promo_move(move);
     int is_bishop_capture_promo = is_bishop_capture_promo_move(move);
     int is_rook_capture_promo = is_rook_capture_promo_move(move);
-    int is_queen_capture_promo = is_queen_capture_promo_move(move);
 
     if (is_quiet)
     {

@@ -267,10 +267,14 @@ bool Board::operator==(const Board& b2)
     {
         std::cout << "game state" << std::endl;
     }
-    return this->piece_bitboards == b2.piece_bitboards && this->white_occupancy == b2.white_occupancy && this->black_occupancy == b2.black_occupancy && this->piece_list == b2.piece_list && this->game_state == b2.game_state;
+    return this->piece_bitboards == b2.piece_bitboards && this->white_occupancy == b2.white_occupancy &&
+           this->black_occupancy == b2.black_occupancy && this->piece_list == b2.piece_list &&
+           this->game_state == b2.game_state;
 }
 
 bool GameState::operator==(const GameState& gs2)
 {
-    return this->side_to_move == gs2.side_to_move && this->castling_rights == gs2.castling_rights && this->ep_square == gs2.ep_square && this->halfmove_clock == gs2.halfmove_clock && this->fullmove_counter == gs2.fullmove_counter;
+    return this->side_to_move == gs2.side_to_move && this->castling_rights == gs2.castling_rights &&
+           this->ep_square == gs2.ep_square && this->halfmove_clock == gs2.halfmove_clock &&
+           this->fullmove_counter == gs2.fullmove_counter;
 }
