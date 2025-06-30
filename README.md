@@ -43,6 +43,10 @@ WhatToDo, but with better planning, additional features, and in C++ because Pyth
 - change all the other vectors to reserve too
 - CONSIDER BRANCHING HERE AND CHANGING EVERYTHING FROM VECTOR TO ARRAY
 
+# How to unmake a move
+- restore the board state
+- create put, remove piece functions that do not change the zobrist key
+
 # Minimax, Negamax, Alpha-Beta pruning
 - board game score IS NOT measured relative, i.e. + is good for white, - is good for black. If it was relative, + is
 good for whatever side, and - is bad for whatever side

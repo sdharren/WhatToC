@@ -112,13 +112,16 @@ void Board::parse_FEN(std::string FEN_string)
     game_state.fullmove_counter = std::stoi(fields[5]);
 }
 
-void Board::put_piece(int piece, int square)
+void Board::put_piece(int piece, int square, bool is_unmake)
 {
     // set piece on bitboard
     set_bit(piece_bitboards[piece], square);
 
     // update zobrist key
-    game_state.zobrist_key ^= zobrist_randoms.piece_randoms[piece][square];
+    if (!is_unmake)
+    {
+        game_state.zobrist_key ^= zobrist_randoms.piece_randoms[piece][square];
+    }
 
     // update piece list
     piece_list[square] = piece;
@@ -137,13 +140,16 @@ void Board::put_piece(int piece, int square)
     // update evaluation TODO
 }
 
-void Board::remove_piece(int piece, int square)
+void Board::remove_piece(int piece, int square, bool is_unmake)
 {
     // remove piece on bitboard
     reset_bit(piece_bitboards[piece], square);
 
     // update zobrist key
-    game_state.zobrist_key ^= zobrist_randoms.piece_randoms[piece][square];
+    if (!is_unmake)
+    {
+        game_state.zobrist_key ^= zobrist_randoms.piece_randoms[piece][square];
+    }
 
     // update piece list
     piece_list[square] = 12;
@@ -162,13 +168,13 @@ void Board::remove_piece(int piece, int square)
     // update evaluation TODO
 }
 
-void Board::move_piece(int piece, int start_square, int target_square)
+void Board::move_piece(int piece, int start_square, int target_square, bool is_unmake)
 {
     // remove piece
-    remove_piece(piece, start_square);
+    remove_piece(piece, start_square, is_unmake);
 
     // put piece
-    put_piece(piece, target_square);
+    put_piece(piece, target_square, is_unmake);
 }
 
 void Board::set_ep_square(int square)
@@ -233,4 +239,38 @@ void Board::print_piece_list()
         }
         std::cout << std::endl;
     }
+}
+
+bool Board::operator==(const Board& b2)
+{
+    if (this->piece_bitboards != b2.piece_bitboards)
+    {
+        std::cout << "bitboards" << std::endl;
+    }
+
+    if (this->white_occupancy != b2.white_occupancy)
+    {
+        std::cout << "white" << std::endl;
+    }
+
+    if (this->black_occupancy != b2.black_occupancy)
+    {
+        std::cout << "black" << std::endl;
+    }
+
+    if (this->piece_list != b2.piece_list)
+    {
+        std::cout << "piece list" << std::endl;
+    }
+
+    if (this->game_state != b2.game_state)
+    {
+        std::cout << "game state" << std::endl;
+    }
+    return this->piece_bitboards == b2.piece_bitboards && this->white_occupancy == b2.white_occupancy && this->black_occupancy == b2.black_occupancy && this->piece_list == b2.piece_list && this->game_state == b2.game_state;
+}
+
+bool GameState::operator==(const GameState& gs2)
+{
+    return this->side_to_move == gs2.side_to_move && this->castling_rights == gs2.castling_rights && this->ep_square == gs2.ep_square && this->halfmove_clock == gs2.halfmove_clock && this->fullmove_counter == gs2.fullmove_counter;
 }

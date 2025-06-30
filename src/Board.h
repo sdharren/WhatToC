@@ -28,7 +28,8 @@ struct GameState
     int halfmove_clock;
     int fullmove_counter;
     Bitboard zobrist_key;
-    Move next_move;
+
+    bool operator==(const GameState& gs2);
 };
 
 class Board {
@@ -46,15 +47,17 @@ public:
 
     // utility functions
     void parse_FEN(std::string FEN_string);
-    void put_piece(int piece, int square);
-    void remove_piece(int piece, int square);
-    void move_piece(int piece, int start_square, int target_square);
+    void put_piece(int piece, int square, bool is_unmake);
+    void remove_piece(int piece, int square, bool is_unmake);
+    void move_piece(int piece, int start_square, int target_square, bool is_unmake);
     void set_ep_square(int square);
     void swap_side();
     void update_castling_rights(int start_square, int target_square);
 
     // debugging functions
     void print_piece_list();
+
+    bool operator==(const Board& b2);
 };
 
 #endif //BOARD_H

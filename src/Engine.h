@@ -8,11 +8,11 @@ public:
     Board board;
     MoveGenerator move_generator;
 
-
     Engine();
     explicit Engine(std::string FEN_string);
 
     bool make_move(Move move);
+    void unmake_move(Move move, GameState game_state, int target_piece);
 };
 
 
