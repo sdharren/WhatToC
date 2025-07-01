@@ -184,7 +184,7 @@ bool Engine::make_move(Move move)
 
     // check if move is legal
     int king = board.game_state.side_to_move == white ? k : K;
-    int k_square = get_LS1B(board.piece_bitboards[king]);
+    int k_square = __builtin_ctzll(board.piece_bitboards[king]);
     if (move_generator.is_square_attacked_by_colour(k_square, board.game_state.side_to_move, board))
     {
         unmake_move(move, copy_game_state, target_piece);

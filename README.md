@@ -43,9 +43,22 @@ WhatToDo, but with better planning, additional features, and in C++ because Pyth
 - change all the other vectors to reserve too
 - CONSIDER BRANCHING HERE AND CHANGING EVERYTHING FROM VECTOR TO ARRAY
 
-# How to unmake a move
-- restore the board state
-- create put, remove piece functions that do not change the zobrist key
+# Optimisation steps
+- definitely switch to __builtin_ctzll()
+- constexpr inline bit manipulation functions
+- add constexpr inline to get_start_square, get_target_square, etc. methods
+- switch from vectors w const elements to fixed sized CONSTEXPR arrays
+
+- change branch heavy make_move() function -- no need to if we make it a switch case
+- make_move() optimisations:
+  - extract move type once, then use switch statement
+    - add move enumeration, to hold the move types
+    - when generating moves, use the move enumereation
+    - when decoding moves, use enum on the switch statement
+  - re-order the is_square_attacked(), since checking sliding pieces is more expensive than leaper pieces
+    - combine rook and bishop into queen attack
+- maybe change the sq_to_char maps, although they aren't used during generate or make move, so probs not
+
 
 # Minimax, Negamax, Alpha-Beta pruning
 - board game score IS NOT measured relative, i.e. + is good for white, - is good for black. If it was relative, + is

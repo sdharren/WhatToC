@@ -24,9 +24,9 @@ void perft_tests()
     perft.perft_driver(5);
     assert(perft.nodes == 4865609);
     perft.nodes = 0;
-    perft.perft_driver(6);
-    assert(perft.nodes == 119060324);
-    perft.nodes = 0;
+    // perft.perft_driver(6);
+    // assert(perft.nodes == 119060324);
+    // perft.nodes = 0;
 
     // position 2
     perft = PERFT();

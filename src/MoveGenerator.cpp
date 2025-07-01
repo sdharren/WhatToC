@@ -226,7 +226,7 @@ Bitboard MoveGenerator::generate_blocker_board(int index, int num_of_blockers, B
     Bitboard blocker_board = 0;
     for (int bit = 0; bit < num_of_blockers; bit++)
     {
-        int square = get_LS1B(attack_mask);
+        int square = __builtin_ctzll(attack_mask);
         attack_mask &= attack_mask - 1;
 
         if (index & (1 << bit)) blocker_board |= 1ULL << square;
@@ -310,7 +310,7 @@ void MoveGenerator::generate_piece_pseudolegal_moves(std::vector<Move> &move_lis
     while (bitboard)
     {
         // get start square
-        int start_square = get_LS1B(bitboard);
+        int start_square = __builtin_ctzll(bitboard);
         Bitboard attack_squares;
         switch (piece)
         {
@@ -334,7 +334,7 @@ void MoveGenerator::generate_piece_pseudolegal_moves(std::vector<Move> &move_lis
         while (attack_squares)
         {
             // get target square
-            int target_square = get_LS1B(attack_squares);
+            int target_square = __builtin_ctzll(attack_squares);
 
             // capture
             if (get_bit(opponent_bitboard, target_square))
@@ -365,7 +365,7 @@ void MoveGenerator::generate_castling_pseudolegal_moves(std::vector<Move> &move_
     Bitboard bitboard = board.piece_bitboards[K + side];
     while (bitboard)
     {
-        int start_square = get_LS1B(bitboard);
+        int start_square = __builtin_ctzll(bitboard);
         // kingside
         if (rights & 0b10)
         {
@@ -409,12 +409,12 @@ void MoveGenerator::generate_pawn_pseudolegal_moves(std::vector<Move>& move_list
     while (bitboard)
     {
         // get start square
-        int start_square = get_LS1B(bitboard);
+        int start_square = __builtin_ctzll(bitboard);
         Bitboard attack_squares = PAWN_ATTACK_TABLE[board.game_state.side_to_move][start_square];
 
         while (attack_squares)
         {
-            int target_square = get_LS1B(attack_squares);
+            int target_square = __builtin_ctzll(attack_squares);
             if (get_bit(opponent_bitboard, target_square))
             {
                 // promotion captures
