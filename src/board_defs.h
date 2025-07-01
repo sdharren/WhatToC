@@ -94,11 +94,13 @@ inline constexpr Bitboard RANK_2_MASK = 0xff00;
 inline constexpr Bitboard RANK_7_MASK = 0xff000000000000;
 
 // Bitboard bit manipulation
-Bitboard get_bit(Bitboard bitboard, int square);
-void set_bit(Bitboard& bitboard, int square);
-void reset_bit(Bitboard& bitboard, int square);
+constexpr Bitboard get_bit(Bitboard bitboard, int square) {return bitboard & (1ULL << square);};
+constexpr void set_bit(Bitboard& bitboard, int square) {bitboard |= (1ULL << square);};
+constexpr void reset_bit(Bitboard& bitboard, int square) {bitboard &= (~(1ULL << square));};
 int count_bits(Bitboard bitboard);
+// DEPRECATED
 int get_LS1B(Bitboard bitboard);
+
 void print(Bitboard bitboard);
 
 #endif //BOARD_DEFS_H

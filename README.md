@@ -44,8 +44,8 @@ WhatToDo, but with better planning, additional features, and in C++ because Pyth
 - CONSIDER BRANCHING HERE AND CHANGING EVERYTHING FROM VECTOR TO ARRAY
 
 # Optimisation steps
-- definitely switch to __builtin_ctzll()
-- constexpr inline bit manipulation functions
+- ~~definitely switch to __builtin_ctzll()~~
+- ~~constexpr inline bit manipulation functions~~
 - add constexpr inline to get_start_square, get_target_square, etc. methods
 - switch from vectors w const elements to fixed sized CONSTEXPR arrays
 
