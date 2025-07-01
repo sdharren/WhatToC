@@ -339,12 +339,12 @@ void MoveGenerator::generate_piece_pseudolegal_moves(std::vector<Move> &move_lis
             // capture
             if (get_bit(opponent_bitboard, target_square))
             {
-                move_list[move_count] = create_move(start_square, target_square, 0b0100);
+                move_list[move_count] = create_move(start_square, target_square, capture);
             }
             // quiet
             else
             {
-                move_list[move_count] = create_move(start_square, target_square, 0b0);
+                move_list[move_count] = create_move(start_square, target_square, quiet);
             }
             move_count++;
 
@@ -374,7 +374,7 @@ void MoveGenerator::generate_castling_pseudolegal_moves(std::vector<Move> &move_
                 !get_bit(board.occupied_squares, start_square + 1) &&
                 !get_bit(board.occupied_squares, start_square + 2))
             {
-                move_list[move_count] = create_move(start_square, start_square + 2, 0b10);
+                move_list[move_count] = create_move(start_square, start_square + 2, kingside_castle);
                 move_count++;
             }
         }
@@ -387,7 +387,7 @@ void MoveGenerator::generate_castling_pseudolegal_moves(std::vector<Move> &move_
                 !get_bit(board.occupied_squares, start_square - 2) &&
                 !get_bit(board.occupied_squares, start_square - 3))
             {
-                move_list[move_count] = create_move(start_square, start_square - 2, 0b11);
+                move_list[move_count] = create_move(start_square, start_square - 2, queenside_castle);
                 move_count++;
             }
         }
@@ -420,20 +420,20 @@ void MoveGenerator::generate_pawn_pseudolegal_moves(std::vector<Move>& move_list
                 // promotion captures
                 if (get_bit(promotion_mask, target_square))
                 {
-                    move_list[move_count] = create_move(start_square, target_square, 0b1100);
+                    move_list[move_count] = create_move(start_square, target_square, knight_capture_promo);
                     move_count++;
-                    move_list[move_count] = create_move(start_square, target_square, 0b1101);
+                    move_list[move_count] = create_move(start_square, target_square, bishop_capture_promo);
                     move_count++;
-                    move_list[move_count] = create_move(start_square, target_square, 0b1110);
+                    move_list[move_count] = create_move(start_square, target_square, rook_capture_promo);
                     move_count++;
-                    move_list[move_count] = create_move(start_square, target_square, 0b1111);
+                    move_list[move_count] = create_move(start_square, target_square, queen_capture_promo);
                     move_count++;
                 }
 
                 // regular capture
                 else
                 {
-                    move_list[move_count] = create_move(start_square, target_square, 0b100);
+                    move_list[move_count] = create_move(start_square, target_square, capture);
                     move_count++;
                 }
             }
@@ -441,7 +441,7 @@ void MoveGenerator::generate_pawn_pseudolegal_moves(std::vector<Move>& move_list
             // en-passant capture
             if (target_square == board.game_state.ep_square)
             {
-                move_list[move_count] = create_move(start_square, board.game_state.ep_square, 0b101);
+                move_list[move_count] = create_move(start_square, board.game_state.ep_square, ep);
                 move_count++;
             }
             attack_squares &= attack_squares - 1;
@@ -456,7 +456,7 @@ void MoveGenerator::generate_pawn_pseudolegal_moves(std::vector<Move>& move_list
             if (!get_bit(board.occupied_squares, single_push) &&
                 !get_bit(board.occupied_squares, double_push))
             {
-                move_list[move_count] = create_move(start_square, double_push, 0b1);
+                move_list[move_count] = create_move(start_square, double_push, double_pawn_push);
                 move_count++;
             }
         }
@@ -466,20 +466,20 @@ void MoveGenerator::generate_pawn_pseudolegal_moves(std::vector<Move>& move_list
             // single push promotion
             if (get_bit(promotion_mask, single_push))
             {
-                move_list[move_count] = create_move(start_square, single_push, 0b1000);
+                move_list[move_count] = create_move(start_square, single_push, knight_promo);
                 move_count++;
-                move_list[move_count] = create_move(start_square, single_push, 0b1001);
+                move_list[move_count] = create_move(start_square, single_push, bishop_promo);
                 move_count++;
-                move_list[move_count] = create_move(start_square, single_push, 0b1010);
+                move_list[move_count] = create_move(start_square, single_push, rook_promo);
                 move_count++;
-                move_list[move_count] = create_move(start_square, single_push, 0b1011);
+                move_list[move_count] = create_move(start_square, single_push, queen_promo);
                 move_count++;
             }
 
             // single push
             else
             {
-                move_list[move_count] = create_move(start_square, single_push, 0b0);
+                move_list[move_count] = create_move(start_square, single_push, quiet);
                 move_count++;
             }
         }
